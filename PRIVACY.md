@@ -49,16 +49,16 @@ each device asks a public STUN server (`stun.l.google.com`) for its own internet
 
 ### Error reports
 
-When Remotrol on a computer or phone hits an error it did not expect, or a window of it crashes, it sends an error report to Runners' project
+When Remotrol on a computer or phone hits an error it did not expect, it sends an error report to Runners' project
 on Sentry (`sentry.io`), an error tracking service, so that we can find and fix the problem. A report holds the kind of
 error, the lines of Remotrol's code where it happened, the Remotrol version and the operating system version. Before a
 report leaves the device, Remotrol replaces email addresses, tokens and passwords, the name of your home folder, this
 device's name and your user name with `[가림]` ("hidden"), and leaves out window titles, typed and pasted text, the
-account, the device name and your IP address. Reports never hold screenshots, screen recordings or console logs. If
-Remotrol itself quits unexpectedly, the report also carries a crash dump: a copy of the part of Remotrol's memory needed
-to see where it stopped. Each time Remotrol starts, it also tells Sentry that a run began and, later, whether it ended in
-a crash, with the Remotrol version and nothing else, so that we can tell how often each version crashes. Runners uses
-these only to fix errors.
+account, the device name and your IP address. Reports never hold screenshots, screen recordings or console logs. When
+the whole app quits unexpectedly (a crash), Remotrol sends no crash record or memory dump, because those cannot have
+personal details removed first. Each time Remotrol starts, it also tells Sentry that a run began and whether it ended
+normally or with an error, with the Remotrol version and nothing else, so that we can tell how often each version runs
+without errors. Runners uses these only to fix errors.
 
 ### Claude
 
@@ -122,14 +122,14 @@ Remotrol 이 인터넷에 접속하는 일은 업데이트, 아래 사무실 연
 
 ### 오류 보고
 
-컴퓨터나 휴대폰의 Remotrol 에 예상하지 못한 오류가 나거나 창 하나가 멈추면, 문제를 찾아 고치려고 오류 보고를 오류 수집 서비스 Sentry
+컴퓨터나 휴대폰의 Remotrol 에 예상하지 못한 오류가 나면, 문제를 찾아 고치려고 오류 보고를 오류 수집 서비스 Sentry
 (`sentry.io`)의 Runners 프로젝트로 보냅니다. 보고에는 오류 종류, 오류가 난 Remotrol 코드 줄, Remotrol 판, 운영체제 판이
 들어갑니다. 보고가 기기를 떠나기 전에 Remotrol 은 이메일 주소 · 토큰 · 비밀번호 · 홈 폴더 이름 · 이 기기 이름 · 사용자
 이름을 `[가림]` 으로 바꾸고, 창 제목 · 입력하거나 붙여 넣은 글 · 계정 · 기기 이름 · IP 주소는 빼고 보냅니다. 스크린샷 ·
-화면 녹화 · 콘솔 기록은 보내지 않습니다. Remotrol 자체가 갑자기 꺼지면 어디서 멈췄는지 보는 데 필요한 Remotrol
-메모리 일부를 복사한 파일(크래시 덤프)도 함께 보냅니다. 또 Remotrol 이 켜질 때마다 한 번 켜졌다는 것과, 나중에 그 실행이
-비정상으로 끝났는지를 Remotrol 판과 함께 Sentry 에 알립니다. 판마다 얼마나 자주 멈추는지 세기 위한 것이고 그 밖의 정보는
-들어가지 않습니다. Runners 는 이것들을 오류를 고치는 데만 씁니다.
+화면 녹화 · 콘솔 기록은 보내지 않습니다. 앱이 통째로 갑자기 꺼지는 충돌이 나도 충돌 기록과 메모리 덤프는 보내지
+않습니다. 그 안의 개인 정보를 먼저 지울 수 없기 때문입니다. 또 Remotrol 이 켜질 때마다 한 번 켜졌다는 것과 그 실행이
+정상으로 끝났는지 오류로 끝났는지를 Remotrol 판과 함께 Sentry 에 알립니다. 판마다 오류 없이 쓰인 비율을 보기 위한 것이고
+그 밖의 정보는 들어가지 않습니다. Runners 는 이것들을 오류를 고치는 데만 씁니다.
 
 ### Claude
 
