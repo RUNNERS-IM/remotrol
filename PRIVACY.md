@@ -1,12 +1,12 @@
 # Remotrol Privacy Policy
 
-Last updated: November 10, 2026
+Last updated: November 15, 2026
 
 Remotrol is an app made by Runners Co., Ltd for seeing and clicking the screens of other computers. This policy covers every version of Remotrol.
 
 ## What Remotrol collects
 
-Only the RUNNERS account you sign in with, as described under Office connection below. Remotrol has no ads and no analytics, and it does not send anything else about you or your computer to Runners or anyone else.
+The RUNNERS account you sign in with, as described under Office connection below, and error reports, as described under Error reports below. Remotrol has no ads and no analytics, and it does not send anything else about you or your computer to Runners or anyone else.
 
 ## What Remotrol reads on your computer
 
@@ -20,7 +20,7 @@ Copy and paste work between this computer and the computer on screen, as plain t
 
 ## Network
 
-Remotrol connects to the internet for two things: updates, and the office connection below. A minute after it starts and once a day after that, it reads
+Remotrol connects to the internet for three things: updates, the office connection below, and error reports. A minute after it starts and once a day after that, it reads
 the list of releases and the update file (`latest-mac.yml`, `latest.yml` or `latest-linux.yml`) from Remotrol's GitHub
 release page to see whether there is a newer version; if there is, it downloads it, then asks you, and only installs it
 when you choose Install Now. Choosing Later means it does not ask again that day. The requests carry nothing about you
@@ -47,6 +47,19 @@ each device asks a public STUN server (`stun.l.google.com`) for its own internet
   and is gone when Remotrol quits.
 - Pictures sent to another computer are not saved on either computer.
 
+### Error reports
+
+When Remotrol on a computer or phone hits an error it did not expect, or a window of it crashes, it sends an error report to Runners' project
+on Sentry (`sentry.io`), an error tracking service, so that we can find and fix the problem. A report holds the kind of
+error, the lines of Remotrol's code where it happened, the Remotrol version and the operating system version. Before a
+report leaves the device, Remotrol replaces email addresses, tokens and passwords, the name of your home folder, this
+device's name and your user name with `[가림]` ("hidden"), and leaves out window titles, typed and pasted text, the
+account, the device name and your IP address. Reports never hold screenshots, screen recordings or console logs. If
+Remotrol itself quits unexpectedly, the report also carries a crash dump: a copy of the part of Remotrol's memory needed
+to see where it stopped. Each time Remotrol starts, it also tells Sentry that a run began and, later, whether it ended in
+a crash, with the Remotrol version and nothing else, so that we can tell how often each version crashes. Runners uses
+these only to fix errors.
+
 ### Claude
 
 When you add Remotrol's MCP server to Claude, Claude can list the computers, see their screens and, with the approval
@@ -61,13 +74,13 @@ Questions: open an issue at https://github.com/RUNNERS-IM/remotrol/issues.
 
 # Remotrol 개인정보 처리방침
 
-최종 수정: 2026년 11월 10일
+최종 수정: 2026년 11월 15일
 
 Remotrol 은 Runners Co., Ltd 가 만드는, 다른 컴퓨터 화면을 보고 누르는 앱입니다. 이 방침은 모든 Remotrol 에 적용됩니다.
 
 ## 모으는 정보
 
-아래 사무실 연결에 적은, 로그인한 RUNNERS 계정 정보뿐입니다. Remotrol 에는 광고와 사용 통계 수집이 없고, 그 밖에 사용자나 컴퓨터에 관한 정보를 Runners 나 다른 곳으로 보내지 않습니다.
+아래 사무실 연결에 적은 로그인한 RUNNERS 계정 정보와, 아래 오류 보고에 적은 오류 보고뿐입니다. Remotrol 에는 광고와 사용 통계 수집이 없고, 그 밖에 사용자나 컴퓨터에 관한 정보를 Runners 나 다른 곳으로 보내지 않습니다.
 
 ## 컴퓨터 안에서 읽는 정보
 
@@ -81,7 +94,7 @@ Remotrol 창에서 다른 컴퓨터 화면을 볼 때, 그 화면 그림 위의 
 
 ## 인터넷 연결
 
-Remotrol 이 인터넷에 접속하는 일은 업데이트와 아래 사무실 연결 두 가지입니다. 켜진 지 1분 뒤와 그 뒤 하루에 한 번 Remotrol 의 GitHub
+Remotrol 이 인터넷에 접속하는 일은 업데이트, 아래 사무실 연결, 오류 보고 세 가지입니다. 켜진 지 1분 뒤와 그 뒤 하루에 한 번 Remotrol 의 GitHub
 릴리스 페이지에서 릴리스 목록과 업데이트 파일(`latest-mac.yml`, `latest.yml`, `latest-linux.yml`)을 받아 새 버전이
 있는지 보고, 있으면 먼저 받아 둔 뒤 물어보고 **지금 설치** 를 고를 때만 설치합니다. **나중에** 를 고르면 그날은 다시
 묻지 않습니다. 이 요청에는 사용자나 컴퓨터에 관한 정보가 들어가지 않습니다. 다만 다른 내려받기와 마찬가지로 GitHub 는
@@ -106,6 +119,17 @@ Remotrol 이 인터넷에 접속하는 일은 업데이트와 아래 사무실 �
 - 접속 기록(누가 언제 보거나 클릭 · 입력 · 복사 · 붙여넣기를 했는지. 친 글자와 복사한 글의 내용은 적지 않습니다)은 이 컴퓨터 메모리에만 있고 Remotrol 을
   끄면 사라집니다.
 - 다른 컴퓨터로 보낸 화면은 어느 쪽 컴퓨터에도 저장하지 않습니다.
+
+### 오류 보고
+
+컴퓨터나 휴대폰의 Remotrol 에 예상하지 못한 오류가 나거나 창 하나가 멈추면, 문제를 찾아 고치려고 오류 보고를 오류 수집 서비스 Sentry
+(`sentry.io`)의 Runners 프로젝트로 보냅니다. 보고에는 오류 종류, 오류가 난 Remotrol 코드 줄, Remotrol 판, 운영체제 판이
+들어갑니다. 보고가 기기를 떠나기 전에 Remotrol 은 이메일 주소 · 토큰 · 비밀번호 · 홈 폴더 이름 · 이 기기 이름 · 사용자
+이름을 `[가림]` 으로 바꾸고, 창 제목 · 입력하거나 붙여 넣은 글 · 계정 · 기기 이름 · IP 주소는 빼고 보냅니다. 스크린샷 ·
+화면 녹화 · 콘솔 기록은 보내지 않습니다. Remotrol 자체가 갑자기 꺼지면 어디서 멈췄는지 보는 데 필요한 Remotrol
+메모리 일부를 복사한 파일(크래시 덤프)도 함께 보냅니다. 또 Remotrol 이 켜질 때마다 한 번 켜졌다는 것과, 나중에 그 실행이
+비정상으로 끝났는지를 Remotrol 판과 함께 Sentry 에 알립니다. 판마다 얼마나 자주 멈추는지 세기 위한 것이고 그 밖의 정보는
+들어가지 않습니다. Runners 는 이것들을 오류를 고치는 데만 씁니다.
 
 ### Claude
 
