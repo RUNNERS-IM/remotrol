@@ -99,7 +99,7 @@ tccutil reset Accessibility im.runners.remote
 
 ## Privacy
 
-Remotrol collects nothing for Runners. Screens travel only between computers in the same private network. See [PRIVACY.md](PRIVACY.md).
+Remotrol has no ads or analytics. When it hits an error, it sends a crash report (the kind of error, the lines of code, the app and OS versions) to Runners' error tracker (Sentry), with emails, tokens and the computer's names removed first. Screens travel directly between devices of the same account and never through Runners. See [PRIVACY.md](PRIVACY.md).
 
 ## License
 

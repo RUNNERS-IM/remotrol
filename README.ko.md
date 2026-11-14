@@ -98,7 +98,7 @@ tccutil reset Accessibility im.runners.remote
 
 ## 개인정보
 
-Remotrol 은 우리 회사로 아무것도 모으지 않습니다. 화면은 같은 망에 들어온 컴퓨터끼리만 오갑니다. [PRIVACY.md](PRIVACY.md) 를 보세요.
+Remotrol 에는 광고와 사용 통계 수집이 없습니다. 오류가 나면 오류 보고(오류 종류 · 코드 줄 · 앱 판 · OS 판)를 이메일 · 토큰 · 컴퓨터 이름을 지운 뒤 Runners 의 오류 수집 서비스(Sentry)로 보냅니다. 화면은 같은 계정의 기기끼리 바로 오가고 Runners 를 거치지 않습니다. [PRIVACY.md](PRIVACY.md) 를 보세요.
 
 ## 라이선스
 
