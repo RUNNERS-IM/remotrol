@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { CircleUser, History, Info, Laptop, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
 import { RunnersAbout, type RunnersT } from "./runners-account/runners-about";
-import { SignInSheet, type CodePurpose, type SignMode } from "./runners-account/runners-account";
+import { BadgePanda, SignInSheet, type CodePurpose, type SignMode } from "./runners-account/runners-account";
 import { locale, statusText, t } from "./i18n";
 import * as native from "./native";
 import type { Link, LogEntry, MenuCommand, MenuState, PermissionKind, SettingsTab, Status } from "./native";
@@ -250,8 +250,10 @@ function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void })
           {link.account ? (
             <div className="s-row">
               <div className="s-row-line">
+                {/* Why the panda and not the email's first letter: the account button in the window shows the panda, and one
+                    account should look the same everywhere (kit 0.1.36). */}
                 <span className="ra-badge ra-large" aria-hidden>
-                  {(link.account.match(/[\p{L}\p{N}]/u)?.[0] ?? "?").toUpperCase()}
+                  <BadgePanda />
                 </span>
                 <div className="s-row-text">
                   <span className="s-row-title">{link.account}</span>
