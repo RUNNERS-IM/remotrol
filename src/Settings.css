@@ -67,9 +67,15 @@ html[data-window='settings'] body { background: var(--rw-window-bg); overflow: h
 .toolbar-item:active {
   background: var(--control-track);
 }
+/* Why grey fill and bold label, not the accent colour: the accent is black, so a black selected tab sank into the dark
+   window (design system decision 1A, kit 0.1.35). */
 .toolbar-item.selected {
-  background: var(--control-track);
-  color: var(--rw-primary);
+  background: var(--r-selected-bg);
+  color: var(--r-selected-text);
+}
+.toolbar-item.selected span {
+  color: var(--r-selected-text);
+  font-weight: 600;
 }
 /* The top of the This Mac tab (decision `[RUNNERS] 디자인 시스템` 5A): the computer's name large, its state under it, and Disconnect Now while someone is looking. */
 .s-status {

@@ -1,9 +1,10 @@
 // Remote's main process: a menu bar app whose picture shows whether this computer can be seen (off / waiting / being
 // viewed), a panel under it listing the other computers, the Remote window that shows every office computer and one
 // computer's screens with clicks and typing, and Settings for everything about this Mac.
+import * as Sentry from "@sentry/electron/main";
 import { app, BrowserWindow, clipboard, ipcMain, Menu, nativeTheme, screen, shell, type Tray } from "electron";
 import { writeFileSync } from "node:fs";
-import { uptime } from "node:os";
+import { hostname, uptime, userInfo } from "node:os";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import type { Allow, Input, PermissionKind, PressAt, SettingsTab } from "../preload/api";
@@ -21,6 +22,16 @@ import * as status from "./status";
 import { createTray, showState } from "./tray";
 import { checkNow, displayVersion, startUpdates } from "./updates";
 import { allowClose, answerUpdate, askUpdate, createPanel, placeUnderTray, prepareViewer, showSettings, showViewer, TRANSLUCENT, updateOffer, viewerContents } from "./windows";
+import { startErrorReport } from "./runners/error-report";
+
+// Why first: crashes while starting up are reported too. With no DSN in the build (debug runs, builds before the
+// Sentry project exists) this does nothing; the kit drops screenshots and hides emails, tokens and this Mac's names.
+startErrorReport(Sentry, {
+  dsn: import.meta.env.MAIN_VITE_SENTRY_DSN,
+  release: `remote@${app.getVersion()}`,
+  environment: app.isPackaged ? "production" : "development",
+  hide: [hostname(), userInfo().username],
+});
 
 const ISSUES_URL = "https://github.com/RUNNERS-IM/remote/issues";
 const STATUS_EVERY_MS = 2000;
