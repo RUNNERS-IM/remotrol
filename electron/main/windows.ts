@@ -11,17 +11,33 @@ const GAP = 4;
 const UPDATE_WIDTH = 400;
 /** Buttons and keys in the update window do nothing this long after it appears. */
 const UPDATE_GUARD_MS = 1000;
-/** Debug runs only: `REMOTE_SOLID=1` turns the blur off, because a page capture shows a see-through window as white. */
-const SOLID = !app.isPackaged && process.env.REMOTE_SOLID === "1";
+/** Debug runs only: `REMOTE_SOLID=1` (and the test-shot run) turns the blur off, because a page capture shows a
+ *  see-through window as white. */
+const SOLID = !app.isPackaged && (process.env.REMOTE_SOLID === "1" || Boolean(process.env.RUNNERS_TEST_SHOTS?.trim()));
 /** Whether the OS blurs what is behind a window; the page draws a solid background when it does not. */
 export const TRANSLUCENT = !SOLID && (process.platform === "darwin" || process.platform === "win32");
 
 /** The design system's window background (--rw-window-bg), so a window shows no other colour before its page paints. */
 const windowBackground = () => (nativeTheme.shouldUseDarkColors ? "#0a0a0a" : "#ffffff");
 
+let pageLang: string | null = null;
+
+/** The test-shot run's language for pages loaded from now on; normal runs leave it to the system. */
+export function setPageLang(lang: string): void {
+  pageLang = lang;
+}
+
 function load(window: BrowserWindow, page: "viewer" | "panel" | "settings" | "update", query = ""): void {
+  if (pageLang) query = [query, `lang=${encodeURIComponent(pageLang)}`].filter(Boolean).join("&");
   if (process.env.ELECTRON_RENDERER_URL) void window.loadURL(`${process.env.ELECTRON_RENDERER_URL}${query ? `?${query}` : ""}#${page}`);
   else void window.loadFile(join(__dirname, "../renderer/index.html"), { hash: page, search: query });
+}
+
+/** Loads `page` into `window` again, with the test-shot run's language when one is set; resolves once it has loaded. */
+export function reloadPage(window: BrowserWindow, page: "viewer" | "panel"): Promise<void> {
+  const done = new Promise<void>((resolve) => window.webContents.once("did-finish-load", () => resolve()));
+  load(window, page);
+  return done;
 }
 
 const preload = join(__dirname, "../preload/index.js");

@@ -60,7 +60,8 @@ Apple 실리콘 맥에서 인텔 맥용으로도 만들려면 `rustup target add
 - `native/` 는 네이티브 모듈 하나(napi-rs)입니다: 화면 찍기, 클릭 넣기, 앞에 있는 앱 알아내기, 권한 확인, 메뉴 막대 그림.
 - `electron/main/account.ts` 는 로그인하고 토큰을 두며, `electron/main/relay.ts` 는 중계 연결을 붙들고, `src/peer.ts`(켤 때 숨긴 채 만드는 Remotrol 창 안)가 WebRTC 연결을 둡니다. `electron/main/link.ts` 가 다른 기기의 요청에 답하고 Claude 를 위해 다른 기기에 물으며, `electron/main/claude.ts` 가 MCP 스크립트의 요청을 받습니다.
 - 화면 글자는 `locales/` 에 있고 `ko.json` 이 기준입니다. 화면과 메인 프로세스가 같은 파일을 읽습니다.
-- 개발 실행에서는 `REMOTE_OPEN=panel|viewer|settings[:탭]`, `REMOTE_THEME=dark|light`, 연 창을 그림으로 저장하는 `REMOTE_SHOT=<파일.png>` 를 씁니다. 설치한 앱은 이 값을 무시합니다.
+- 개발 실행에서는 `REMOTE_OPEN=panel|viewer|settings[:탭]`, `REMOTE_THEME=dark|light`를 씁니다. 설치한 앱은 이 값을 무시합니다.
+- 개발 실행에서 `RUNNERS_TEST_SHOTS=<폴더>` 로 켜면 앱이 창을 하나씩 열어 한국어 · 영어, 밝은 · 어두운 화면으로 찍고 `shots.json` 을 쓴 뒤 꺼집니다. `RUNNERS_TEST_ACCOUNT=signed-in` 에 `REMOTE_API_URL` 을 `scripts/relay-dev.mjs` 로 두면 로그인 뒤 화면도 찍습니다. 공통 규약은 RUNNERS 앱 kit `desktop/README.md` 「시험 촬영 모드」에 있습니다.
 - 서버 없이 맥 한 대에서 컴퓨터 두 대를 시험하려면 `node scripts/relay-dev.mjs`(127.0.0.1:8790 에서 어떤 이메일이든 받는 대역 중계 · 로그인)를 켜고, 각 벌을 `REMOTE_API_URL=http://127.0.0.1:8790`, 따로 쓰는 `--user-data-dir`, 진짜 화면 대신 그린 시험 화면을 보내는 `REMOTE_FAKE_SCREEN=1` 로 켭니다.
 
 `pnpm dev` 로 켜면 맥은 Remotrol 이 아니라 Remotrol 을 띄운 터미널 앱에 권한을 묻습니다.

@@ -60,7 +60,8 @@ For an Intel Mac build on Apple silicon, also run `pnpm native --target x86_64-a
 - `native/` is the one native module (napi-rs): display capture, posted clicks, the app in front, permission checks and the tray picture.
 - `electron/main/account.ts` signs in and keeps the tokens, `electron/main/relay.ts` keeps the relay connection, and `src/peer.ts` (in the Remotrol window, made hidden at launch) holds the WebRTC connections. `electron/main/link.ts` answers other devices and asks them for Claude; `electron/main/claude.ts` serves the MCP script.
 - Screen text lives in `locales/`, with `ko.json` as the source; the page and the main process read the same files.
-- Debug runs take `REMOTE_OPEN=panel|viewer|settings[:tab]` `REMOTE_THEME=dark|light`, and `REMOTE_SHOT=<file.png>` to save the opened window as a picture. A packaged app ignores them.
+- Debug runs take `REMOTE_OPEN=panel|viewer|settings[:tab]` `REMOTE_THEME=dark|light`. A packaged app ignores them.
+- `RUNNERS_TEST_SHOTS=<folder>` (debug runs) opens every window by itself, saves a picture of each in Korean and English, light and dark, writes `shots.json` and quits. `RUNNERS_TEST_ACCOUNT=signed-in` with `REMOTE_API_URL` pointing at `scripts/relay-dev.mjs` adds the signed-in screens. The shared rule is in the RUNNERS app kit (`desktop/README.md`, test shots).
 - To try two computers on one Mac without the server: `node scripts/relay-dev.mjs` (a stand-in relay and login on 127.0.0.1:8790 that takes any email), then start each copy with `REMOTE_API_URL=http://127.0.0.1:8790`, its own `--user-data-dir`, and `REMOTE_FAKE_SCREEN=1` to send a drawn test screen instead of the real one.
 
 When run with `pnpm dev`, macOS asks for permissions on behalf of the terminal app that started Remotrol, not Remotrol itself.

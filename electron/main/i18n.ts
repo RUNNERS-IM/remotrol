@@ -30,6 +30,12 @@ export function currentLocale(): string {
   return code;
 }
 
+/** Speaks `tag` from now on instead of the system language (the test-shot run goes through each language). */
+export function setLocale(tag: string): void {
+  code = pickLocale(tag);
+  table = null;
+}
+
 /** Looks up `key` and fills `{{name}}` slots; a key this language lacks reads in English, never as the bare key. */
 export function t(key: string, args: Record<string, string | number> = {}): string {
   // Why: the system language list is only known once the app is ready, so the table is picked on first use.
