@@ -6,15 +6,13 @@
   --card: var(--rw-box-bg);
   --separator: var(--rw-separator);
   --control-track: var(--rw-control-bg);
-  --switch-off: rgba(0, 0, 0, 0.08);
-  /* Why green and not the accent: every RUNNERS app shows an on switch the same way (runners-wiki 2026-11-12). */
-  --switch-on: #34c759;
+  /* Why the kit's blue and dark track: every RUNNERS app shows an on switch the same way (runners-wiki 2026-11-16, 2026-11-15 2A). */
+  --switch-off: var(--r-track);
+  --switch-on: var(--r-active);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --tertiary: rgba(255, 255, 255, 0.25);
-    --switch-off: rgba(255, 255, 255, 0.12);
-    --switch-on: #30d158;
   }
 }
 html[data-window='settings'], html[data-window='settings'] body, html[data-window='settings'] #root { height: 100%; margin: 0; }
@@ -67,15 +65,13 @@ html[data-window='settings'] body { background: var(--rw-window-bg); overflow: h
 .toolbar-item:active {
   background: var(--control-track);
 }
-/* Why grey fill and bold label, not the accent colour: the accent is black, so a black selected tab sank into the dark
-   window (design system decision 1A, kit 0.1.35). */
-.toolbar-item.selected {
+/* The selected tab is the kit's .rw-selected: light blue fill, bold label, only the icon blue (runners-wiki 2026-11-16 2A).
+   Why the two classes: .toolbar-item's transparent background would otherwise win over the kit's. */
+.toolbar-item.rw-selected {
   background: var(--r-selected-bg);
-  color: var(--r-selected-text);
 }
-.toolbar-item.selected span {
+.toolbar-item.rw-selected span {
   color: var(--r-selected-text);
-  font-weight: 600;
 }
 /* The top of the This Mac tab (decision `[RUNNERS] 디자인 시스템` 5A): the computer's name large, its state under it, and Disconnect Now while someone is looking. */
 .s-status {
@@ -108,7 +104,7 @@ html[data-window='settings'] body { background: var(--rw-window-bg); overflow: h
   flex: none;
   border-radius: var(--rw-radius);
   background: var(--card);
-  box-shadow: 0 0 0 var(--rw-border) var(--separator);
+  box-shadow: 0 0 0 1px var(--r-border);
 }
 .s-card-separator {
   height: var(--rw-border);

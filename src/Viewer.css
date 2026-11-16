@@ -4,20 +4,12 @@
    Colours come from App.css. Why the scoped names: Vite puts every stylesheet into one file for all windows. */
 :root[data-window="viewer"] {
   --window: var(--panel);
-  --ok: #34c759;
-  --off: #8e8e93;
-  --bad: #ff3b30;
+  --ok: var(--r-success);
+  --off: var(--r-text-muted);
+  --bad: var(--rw-danger);
   --screen: #000000;
-  /* Menus over the screen: an opaque box, so the picture under it does not show through. */
-  --menu-bg: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root[data-window="viewer"] {
-    --ok: #30d158;
-    --bad: #ff453a;
-    --menu-bg: #2c2c2e;
-  }
+  /* Menus over the screen: the kit's raised box, opaque so the picture under it does not show through. */
+  --menu-bg: var(--r-raised);
 }
 
 /* Why the page itself too: without it the page grows with a tall screen picture, pushing Send Clicks out of the window. */
@@ -55,7 +47,7 @@
 .card {
   padding: var(--rw-row-pad-y) var(--rw-row-pad-x);
   border-radius: var(--rw-radius);
-  border: 0.5px solid var(--line);
+  border: 1px solid var(--r-border);
   background: var(--card);
   display: flex;
   flex-direction: column;
@@ -79,20 +71,6 @@
 
 .state {
   color: var(--sub);
-}
-
-.button {
-  font: inherit;
-  color: var(--ink);
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 0.5px solid var(--line);
-  background: var(--card);
-  cursor: pointer;
-}
-
-.button:hover {
-  border-color: var(--rw-primary);
 }
 
 .viewer-section {
@@ -244,28 +222,6 @@
   gap: 12px;
 }
 
-.knob {
-  position: relative;
-  flex: none;
-  width: 26px;
-  height: 16px;
-  border-radius: 8px;
-  background: var(--track);
-  transition: background 0.15s;
-}
-
-.knob::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #ffffff;
-  transition: transform 0.15s;
-}
-
 .switch-text {
   display: flex;
   flex-direction: column;
@@ -299,23 +255,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.log-switches {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-  min-height: 28px;
-}
-
-.log-switches .button {
-  margin-left: auto;
-}
-
-.button:disabled {
-  cursor: default;
-  opacity: 0.5;
 }
 
 .type-row {
@@ -363,7 +302,7 @@
   text-align: left;
   padding: 8px;
   border-radius: var(--rw-radius);
-  border: 0.5px solid var(--line);
+  border: 1px solid var(--r-border);
   background: var(--card);
   display: flex;
   flex-direction: column;
@@ -425,6 +364,13 @@
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* On or off (and how many displays) at the right of the name; the name gives way first. */
+.tile-label .tab-badge {
+  flex: none;
+  margin-left: auto;
   white-space: nowrap;
 }
 
@@ -490,14 +436,14 @@
   min-width: 0;
 }
 
-/* Why: the same three colours as the dots in the right-click menu; "being viewed" is yellow so it is noticed. */
+/* Why: the kit's status colours (runners-wiki 2026-11-15 3B); "being viewed" is the warning orange so it is noticed. */
 .state-dot {
   display: inline-block;
   flex: none;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #8e8e93;
+  background: var(--off);
 }
 
 .state-dot.waiting {
@@ -505,7 +451,7 @@
 }
 
 .state-dot.viewing {
-  background: #ffcc00;
+  background: var(--r-warning);
 }
 
 .watching {
@@ -514,7 +460,7 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: var(--rw-radius);
-  background: rgba(255, 204, 0, 0.16);
+  background: color-mix(in srgb, var(--r-warning) 16%, transparent);
 }
 
 .watching > span:nth-child(2) {
@@ -570,7 +516,7 @@
   min-width: 240px;
   padding: 6px;
   border-radius: 10px;
-  border: 0.5px solid var(--line);
+  border: 1px solid var(--r-border);
   background: var(--menu-bg);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   display: flex;
@@ -601,6 +547,17 @@
   color: color-mix(in srgb, var(--rw-on-primary) 80%, transparent);
 }
 
+/* The picked display in the display menu is the kit's .rw-picked blue, also under the pointer. */
+.bar-menu-item.rw-picked,
+.bar-menu-item.rw-picked:hover {
+  background: var(--rw-active);
+  color: var(--rw-on-active);
+}
+
+.bar-menu-item.rw-picked .hint {
+  color: color-mix(in srgb, var(--rw-on-active) 80%, transparent);
+}
+
 /* Signed out: the grid's place says what signing in gives, with the same Sign In button as the top right. */
 .signed-out {
   align-items: center;
@@ -612,7 +569,13 @@
 
 .signed-out .switch-label {
   color: var(--ink);
-  font-size: 15px;
+}
+
+/* A situation panda from the design guide (design.runners.im/panda 03-5), 112 like the guide's states page. */
+.empty-panda {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
 }
 
 .signed-out .rw-button {
@@ -731,8 +694,11 @@
   cursor: default;
 }
 
-.bar-button.on {
-  background: rgba(255, 255, 255, 0.18);
+/* A pressed toggle (Keep Bar Shown) is the kit's .rw-picked blue; the hover rule above must not grey it. */
+.bar-button.rw-picked,
+.bar-button.rw-picked:hover:not(:disabled) {
+  background: var(--rw-active);
+  color: var(--rw-on-active);
 }
 
 .bar-button.wide span {
@@ -768,16 +734,6 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
-.bar-switch {
-  gap: 6px;
-  padding: 0 8px;
-  height: 30px;
-}
-
-.bar-switch .knob {
-  background: rgba(255, 255, 255, 0.24);
-}
-
 .bar-menu-box {
   position: relative;
 }
@@ -801,7 +757,7 @@
 
 .invisible {
   visibility: hidden;
-  width: 14px;
+  width: 16px;
 }
 
 .text-menu {

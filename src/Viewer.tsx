@@ -44,6 +44,9 @@ import * as native from "./native";
 import * as peer from "./peer";
 import type { Computer, Display, Input, Link, PeerInfo, Status } from "./native";
 import "./App.css";
+import pandaDisconnected from "./assets/panda/disconnected.webp";
+import pandaEmpty from "./assets/panda/empty_box.webp";
+import pandaLocked from "./assets/panda/locked.webp";
 import "./runners-account/runners-window.css";
 import "./Viewer.css";
 
@@ -260,14 +263,15 @@ export default function Viewer() {
         <div className="watching">
           <span className="state-dot viewing" aria-hidden />
           <span>{t("status.viewers", { names: status.viewers.join(", ") })}</span>
-          <button type="button" className="button" onClick={() => void native.disconnect().then(setLink)}>
+          <button type="button" className="rw-button" onClick={() => void native.disconnect().then(setLink)}>
             {t("menu.disconnect")}
           </button>
         </div>
       )}
       {signedOut ? (
         <section className="card signed-out">
-          <Laptop size={28} strokeWidth={1.25} aria-hidden />
+          {/* Empty screens are picture, one line, one button, as in the design guide (design.runners.im/states 06-2). */}
+          <img className="empty-panda" src={pandaLocked} alt="" draggable={false} />
           <div className="switch-label">{t("account.emptyTitle")}</div>
           <div className="hint">{t("account.intro")}</div>
           <button type="button" className="rw-button default" onClick={() => setSigningIn(true)}>
@@ -382,7 +386,11 @@ function Tile({ computer, visible, onOpen }: { computer: Computer; visible: bool
       <div className="tile-label">
         <span className={computer.online ? "state-dot waiting" : "state-dot"} aria-hidden />
         <span className="tile-name">{computer.name}</span>
-        {monitors > 1 && <span className="tab-badge">{t("grid.monitors", { count: monitors })}</span>}
+        {/* Why the words: a dot alone does not say what it means (runners-wiki 2026-11-15 3B). */}
+        <span className="tab-badge">
+          {t(computer.online ? "computer.online" : "computer.offline")}
+          {monitors > 1 && ` · ${t("grid.monitors", { count: monitors })}`}
+        </span>
       </div>
     </button>
   );
@@ -814,6 +822,7 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
               </>
             ) : (
               <>
+                <img className="empty-panda" src={pandaDisconnected} alt="" draggable={false} />
                 <div className="session-state-title">{t("session.cannotSee", { name })}</div>
                 <div className="hint">{problem}</div>
                 <div className="session-state-buttons">
@@ -849,7 +858,6 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
             <ChevronLeft size={16} strokeWidth={1.5} aria-hidden />
           </button>
           <span className="bar-name">
-            <span className={shown ? "state-dot waiting" : "state-dot"} aria-hidden />
             {name}
           </span>
           <span className="bar-sep" />
@@ -879,14 +887,14 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
                       type="button"
                       role="menuitemradio"
                       aria-checked={all}
-                      className="bar-menu-item"
+                      className={all ? "bar-menu-item rw-picked" : "bar-menu-item"}
                       onClick={() => {
                         setActual(false);
                         setAll(true);
                         setMenu(null);
                       }}
                     >
-                      <Check size={14} strokeWidth={2} className={all ? "" : "invisible"} aria-hidden />
+                      <Check size={16} strokeWidth={1.5} className={all ? "" : "invisible"} aria-hidden />
                       <span>{t("display.all")}</span>
                       <span className="hint">{t("display.allHint", { n: displays.length })}</span>
                     </button>
@@ -899,13 +907,13 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
                     type="button"
                     role="menuitemradio"
                     aria-checked={!all && d.id === chosen}
-                    className="bar-menu-item"
+                    className={!all && d.id === chosen ? "bar-menu-item rw-picked" : "bar-menu-item"}
                     onClick={() => {
                       showOne(d.id);
                       setMenu(null);
                     }}
                   >
-                    <Check size={14} strokeWidth={2} className={!all && d.id === chosen ? "" : "invisible"} aria-hidden />
+                    <Check size={16} strokeWidth={1.5} className={!all && d.id === chosen ? "" : "invisible"} aria-hidden />
                     <span>{displayLabel(d, index)}</span>
                     <span className="hint">
                       {d.main ? `${t("display.main")} · ` : ""}
@@ -993,7 +1001,7 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
           </button>
           <button
             type="button"
-            className={pinned ? "bar-button on" : "bar-button"}
+            className={pinned ? "bar-button rw-picked" : "bar-button"}
             title={t(pinned ? "session.unpin" : "session.pin")}
             aria-label={t(pinned ? "session.unpin" : "session.pin")}
             aria-pressed={pinned}
@@ -1050,6 +1058,12 @@ function LinkNote({ link }: { link: Link | null }) {
   if (link.state === "failed" && link.error === "elsewhere") return <div className="hint link-note error">{t("link.elsewhere")}</div>;
   if (link.state === "failed" && link.error === "unreachable") return <div className="hint link-note error">{t("link.unreachable")}</div>;
   if (link.state === "failed") return <div className="hint link-note error">{t("link.failed", { error: link.error ?? "" })}</div>;
-  if (link.computers.length === 0) return <div className="hint link-note">{t("link.empty")}</div>;
+  if (link.computers.length === 0)
+    return (
+      <section className="card signed-out">
+        <img className="empty-panda" src={pandaEmpty} alt="" draggable={false} />
+        <div className="hint">{t("link.empty")}</div>
+      </section>
+    );
   return null;
 }
