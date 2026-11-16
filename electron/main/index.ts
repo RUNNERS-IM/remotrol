@@ -14,7 +14,7 @@ import * as keepAlive from "./keepAlive";
 import * as link from "./link";
 import * as login from "./login";
 import { buildMenu, forgetIcons, type Command, type MenuState } from "./menu";
-import { currentLocale, t } from "./i18n";
+import { t } from "./i18n";
 import { native } from "./native";
 import * as screens from "./screens";
 import { readSettings, writeSettings } from "./settings";
@@ -23,6 +23,7 @@ import { createTray, showState } from "./tray";
 import { checkNow, displayVersion, startUpdates } from "./updates";
 import { allowClose, answerUpdate, askUpdate, createPanel, placeUnderTray, prepareViewer, showSettings, showViewer, TRANSLUCENT, updateOffer, viewerContents } from "./windows";
 import { startErrorReport } from "./runners/error-report";
+import { prepareShots, runShots, sampleUpdateNotes, TEST_SHOTS } from "./testShots";
 
 // Why first: crashes while starting up are reported too. With no DSN in the build (debug runs, builds before the
 // Sentry project exists) this does nothing; the kit drops screenshots and hides emails, tokens and this Mac's names.
@@ -384,8 +385,6 @@ function debugHooks(): void {
       panel.showInactive();
     }, 1500);
   if (which?.startsWith("settings")) setTimeout(() => openSettings((which.split(":")[1] as SettingsTab | undefined) || undefined), 1500);
-  // Why: `REMOTE_SHOT=<file.png>` saves the opened window as the app draws it, for the dark and light screenshots
-  // asked for before a release, without giving the terminal the screen recording permission.
   // Why: `REMOTE_CLICK=<css selector>` presses that element in the opened window 3.5 s in, so pages reached by a click
   // (a computer's page, This Mac) can be captured too.
   const press = process.env.REMOTE_CLICK;
@@ -400,21 +399,8 @@ function debugHooks(): void {
   // Windows or Linux machine in CI can show it works without anyone at the screen.
   const selftest = process.env.REMOTE_SELFTEST;
   if (selftest) setTimeout(() => void runSelftest(selftest).finally(() => app.quit()), 3000);
-  const shot = process.env.REMOTE_SHOT;
-  if (shot && which) {
-    setTimeout(() => {
-      const window = BrowserWindow.getAllWindows().find((w) => w.isVisible());
-      void window
-        ?.capturePage()
-        .then((image) => writeFileSync(shot, image.toPNG()))
-        .then(() => console.log("shot:", shot));
-    }, 6000);
-  }
   if (which === "update" || which === "update-progress") {
-    const ko = currentLocale() === "ko";
-    const notes = ko
-      ? ["메뉴 막대 그림이 꺼짐 · 대기 중 · 보는 중을 보여 줍니다.", "업데이트를 받은 뒤 설치할지 묻고, 바뀐 점을 함께 보여 줍니다.", "20개 언어를 지원합니다.", "로그인할 때 이름과 아이콘이 보이게 열립니다.", "화면 보기 창의 간격을 다른 앱과 맞췄습니다.", "다섯 줄이 넘으면 이 칸 안에서 스크롤됩니다."]
-      : ["The menu-bar picture shows off, waiting and being viewed.", "Updates download first, then Remote asks and shows what changed.", "20 languages.", "Opens at login with its name and icon.", "The viewer window uses the same spacing as the other apps.", "Past five lines this box scrolls."];
+    const notes = sampleUpdateNotes();
     // Why: `update-progress` shows the menu check's download state, held at a made-up 42%.
     const downloading = which === "update-progress";
     setTimeout(() => {
@@ -447,7 +433,19 @@ function start(): void {
   prepareViewer(viewerHidden);
   startClaude();
   startUpdates();
-  if (DEV) debugHooks();
+  if (TEST_SHOTS)
+    runShots({
+      panel: () => panel,
+      showPanel: () => {
+        if (!panel) return;
+        placeUnderTray(panel, tray);
+        panel.showInactive();
+      },
+      viewer: () => prepareViewer(viewerHidden),
+      showViewer: () => showViewer(viewerHidden),
+      openSettings: (tab) => showSettings(tab),
+    });
+  else if (DEV) debugHooks();
   else if (!startedAtLogin()) openViewer();
 }
 
@@ -464,5 +462,6 @@ if (!app.requestSingleInstanceLock()) {
   app.on("before-quit", allowClose);
   // Why: closing a window must not quit a tray app.
   app.on("window-all-closed", () => undefined);
+  prepareShots();
   void app.whenReady().then(start);
 }

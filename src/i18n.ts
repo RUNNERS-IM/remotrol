@@ -20,7 +20,8 @@ function pickLocale(tag: string): string {
   return language in tables ? language : "en";
 }
 
-export const locale = pickLocale(navigator.language || "en");
+// Why the address too: the test-shot run (electron/main/testShots.ts) loads the pages with `?lang=` for each language.
+export const locale = pickLocale(new URLSearchParams(location.search).get("lang") || navigator.language || "en");
 const table: Table = tables[locale];
 
 document.documentElement.lang = locale;
