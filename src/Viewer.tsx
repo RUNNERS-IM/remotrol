@@ -44,9 +44,9 @@ import * as native from "./native";
 import * as peer from "./peer";
 import type { Computer, Display, Input, Link, PeerInfo, Status } from "./native";
 import "./App.css";
-import pandaDisconnected from "./assets/panda/disconnected.webp";
-import pandaEmpty from "./assets/panda/empty_box.webp";
-import pandaLocked from "./assets/panda/locked.webp";
+import pandaDisconnected from "./runners-account/assets/panda/disconnected.webp";
+import pandaNoComputer from "./runners-account/assets/panda/no-computer.webp";
+import pandaSignIn from "./runners-account/assets/panda/signin.webp";
 import "./runners-account/runners-window.css";
 import "./Viewer.css";
 
@@ -271,7 +271,7 @@ export default function Viewer() {
       {signedOut ? (
         <section className="card signed-out">
           {/* Empty screens are picture, one line, one button, as in the design guide (design.runners.im/states 06-2). */}
-          <img className="empty-panda" src={pandaLocked} alt="" draggable={false} />
+          <img className="empty-panda" src={pandaSignIn} alt="" draggable={false} />
           <div className="switch-label">{t("account.emptyTitle")}</div>
           <div className="hint">{t("account.intro")}</div>
           <button type="button" className="rw-button default" onClick={() => setSigningIn(true)}>
@@ -822,7 +822,7 @@ function Detail(props: { host: string; name: string; online: boolean; visible: b
               </>
             ) : (
               <>
-                <img className="empty-panda" src={pandaDisconnected} alt="" draggable={false} />
+                <img className="problem-icon" src={pandaDisconnected} alt="" draggable={false} />
                 <div className="session-state-title">{t("session.cannotSee", { name })}</div>
                 <div className="hint">{problem}</div>
                 <div className="session-state-buttons">
@@ -1055,13 +1055,20 @@ function AllScreens(props: { displays: Display[]; streams: MediaStream[]; onPick
 function LinkNote({ link }: { link: Link | null }) {
   if (!link || link.state === "signedOut") return null;
   if (link.state === "starting") return <div className="hint link-note">{t("link.starting")}</div>;
-  if (link.state === "failed" && link.error === "elsewhere") return <div className="hint link-note error">{t("link.elsewhere")}</div>;
-  if (link.state === "failed" && link.error === "unreachable") return <div className="hint link-note error">{t("link.unreachable")}</div>;
-  if (link.state === "failed") return <div className="hint link-note error">{t("link.failed", { error: link.error ?? "" })}</div>;
+  if (link.state === "failed") {
+    const text =
+      link.error === "elsewhere" ? t("link.elsewhere") : link.error === "unreachable" ? t("link.unreachable") : t("link.failed", { error: link.error ?? "" });
+    return (
+      <div className="hint link-note error">
+        <img className="link-note-icon" src={pandaDisconnected} alt="" draggable={false} />
+        {text}
+      </div>
+    );
+  }
   if (link.computers.length === 0)
     return (
       <section className="card signed-out">
-        <img className="empty-panda" src={pandaEmpty} alt="" draggable={false} />
+        <img className="empty-panda" src={pandaNoComputer} alt="" draggable={false} />
         <div className="hint">{t("link.empty")}</div>
       </section>
     );
