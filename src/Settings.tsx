@@ -9,6 +9,7 @@ import { locale, statusText, t } from "./i18n";
 import * as native from "./native";
 import type { Link, LogEntry, MenuCommand, MenuState, PermissionKind, SettingsTab, Status } from "./native";
 import { useAppIcon } from "./appIcon";
+import pandaSignIn from "./runners-account/assets/panda/signin.webp";
 import "./App.css";
 import "./runners-account/runners-window.css";
 import "./runners-account/runners-account.css";
@@ -265,11 +266,20 @@ function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void })
               </div>
             </div>
           ) : (
-            <Row title={t("account.intro")}>
-              <button type="button" className="rw-button default" onClick={() => setSigningIn(true)}>
-                {t("account.signIn")}
-              </button>
-            </Row>
+            <div className="s-row">
+              <div className="s-row-line">
+                <img className="s-account-panda" src={pandaSignIn} alt="" draggable={false} />
+                <div className="s-row-text">
+                  <span className="s-row-title">{t("account.intro")}</span>
+                </div>
+                <div className="s-row-space" />
+                <div className="s-row-control">
+                  <button type="button" className="rw-button default" onClick={() => setSigningIn(true)}>
+                    {t("account.signIn")}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
         {link.account && <p className="s-section-hint">{t("account.intro")}</p>}

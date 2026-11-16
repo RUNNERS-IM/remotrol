@@ -189,3 +189,11 @@ html[data-window='settings'] body { background: var(--rw-window-bg); overflow: h
 .settings-about { flex: 1; min-height: 0; overflow-y: auto; }
 /* Why: twice the pad at the sides, so the cards in the About tab line up with the other tabs' cards. */
 .settings-about .about-embedded { padding-inline: calc(2 * var(--rw-pad)); }
+
+/* The kit's sign-in panda, the size of the signed-in account circle in the same row. */
+.s-account-panda {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}

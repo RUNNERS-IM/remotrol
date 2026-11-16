@@ -571,10 +571,24 @@
   color: var(--ink);
 }
 
-/* A situation panda from the design guide (design.runners.im/panda 03-5), 112 like the guide's states page. */
+/* A panda from the kit (assets/panda), 112 like the guide's states page; always a cheerful face (2026-11-16). */
 .empty-panda {
   width: 112px;
   height: 112px;
+  object-fit: contain;
+}
+
+/* The kit's small "disconnected" object picture, beside a connection error rather than a large panda. */
+.problem-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.link-note-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
