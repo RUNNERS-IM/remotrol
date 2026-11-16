@@ -7,5 +7,5 @@
 ## English
 
 - On switches, the selected tab, the selected display and the pin button now use the shared RUNNERS blue, and cards and menus have a light border.
-- Computer tiles now say "On" or "Off" in words, so you don't have to tell them apart by dot color.
+- Computer tiles now say "On" or "Offline" in words, so you don't have to tell them apart by dot color.
 - The signed-out, no-other-computers and connection-problem screens now show a panda illustration.
