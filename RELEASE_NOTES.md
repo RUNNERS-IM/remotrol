@@ -1,10 +1,11 @@
 ## 한국어
 
-- 회원가입이나 비밀번호 바꾸기에서 비밀번호 형식이 맞지 않으면, 같은 안내가 회색 글과 빨간 글로 두 번 나오던 것을 빨간 글 한 줄로 줄였습니다.
-- 업데이트 창의 질문이 「Remotrol 2.6.… 버전을 설치할까요?」처럼 자연스럽게 읽힙니다.
-- 다른 컴퓨터에 연결하지 못했을 때 「서버에 연결하지 못했습니다」로 알려 줍니다.
-- 상대 컴퓨터의 Remotrol 이 이전 버전일 때 나오는 안내와, 오픈소스 고지 첫 문장의 띄어쓰기를 다듬었습니다.
+- 켜진 스위치 · 고른 탭 · 고른 모니터 · 고정 단추를 RUNNERS 앱 공통 파랑으로 맞추고, 카드와 메뉴에 옅은 테두리를 넣었습니다.
+- 컴퓨터 칸에 「켜져 있음」 · 「꺼져 있음」 글자를 함께 보여 줘 점 색만으로 구분하지 않아도 됩니다.
+- 로그인 전 · 다른 컴퓨터 없음 · 연결 문제 화면에 판다 그림을 넣었습니다.
 
 ## English
 
-- When signing up or changing your password, a password that doesn't meet the rules now shows one red message instead of the same rule twice in grey and red.
+- On switches, the selected tab, the selected display and the pin button now use the shared RUNNERS blue, and cards and menus have a light border.
+- Computer tiles now say "On" or "Offline" in words, so you don't have to tell them apart by dot color.
+- The signed-out, no-other-computers and connection-problem screens now show a panda illustration.
