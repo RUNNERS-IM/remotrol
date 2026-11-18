@@ -1,13 +1,14 @@
 // The Settings window: one window for everything about this Mac, in Split's Settings look (tabs in the toolbar at the
-// top). Tabs: This Mac (seeing it from other computers, permissions), Connection Log, General, Account, About
-// (shared decision 2026-11-07, Remote 1B). The This Mac card in the Remote window, the panel and ⌘, open it.
+// top). Tabs: This Mac (seeing it from other computers, permissions), Connection Log, Claude, General, Account, About
+// (shared decision 2026-11-07, Remote 1B; Claude added 2026-11-19 3B). The This Mac card in the Remote window, the
+// panel and ⌘, open it.
 import { useCallback, useEffect, useState } from "react";
-import { CircleUser, History, Info, Laptop, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
+import { Bot, CircleUser, History, Info, Laptop, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
 import { RunnersAbout, type RunnersT } from "./runners-account/runners-about";
 import { BadgePanda, SignInSheet, type CodePurpose, type SignMode } from "./runners-account/runners-account";
 import { locale, statusText, t } from "./i18n";
 import * as native from "./native";
-import type { Link, LogEntry, MenuCommand, MenuState, PermissionKind, SettingsTab, Status } from "./native";
+import type { ClaudeState, Link, LogEntry, MenuCommand, MenuState, PermissionKind, SettingsTab, Status } from "./native";
 import { useAppIcon } from "./appIcon";
 import pandaSignIn from "./runners-account/assets/panda/signin.webp";
 import "./App.css";
@@ -21,6 +22,7 @@ const mac = navigator.userAgent.includes("Macintosh");
 const TABS: { id: SettingsTab; label: () => string; Icon: LucideIcon }[] = [
   { id: "mac", label: () => t("thisMac.title"), Icon: Laptop },
   { id: "log", label: () => t("log.title"), Icon: History },
+  { id: "claude", label: () => t("settings.tabClaude"), Icon: Bot },
   { id: "general", label: () => t("settings.tabGeneral"), Icon: SettingsIcon },
   { id: "account", label: () => t("settings.tabAccount"), Icon: CircleUser },
   { id: "about", label: () => t("settings.tabAbout"), Icon: Info },
@@ -33,9 +35,18 @@ const aboutT: RunnersT = (key, args) => t(key as Parameters<typeof t>[0], args);
 /** Loads THIRD_PARTY_NOTICES.md only when asked, so the 600 KB of notices does not slow down opening the window. */
 const loadNotices = () => import("../THIRD_PARTY_NOTICES.md?raw").then((file) => file.default);
 
+/** The time, with the day in front once it is not today (the log keeps 7 days). */
+function when(at: number): string {
+  const date = new Date(at);
+  const time = date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  if (date.toDateString() === new Date().toDateString()) return time;
+  return `${date.toLocaleDateString(locale, { month: "short", day: "numeric" })} ${time}`;
+}
+
+const BY_KEY = { computer: "log.byComputer", phone: "log.byPhone", claude: "log.byClaude" } as const;
+
 function logLine(entry: LogEntry): string {
-  const time = new Date(entry.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  return `${time}  ${t(`log.${entry.what}`, { peer: entry.peer })}`;
+  return `${when(entry.at)}  ${t(`log.${entry.what}`, { peer: entry.peer })}`;
 }
 
 // The sign-in sheet reads the failure's short code (bad, exists) from the error's message.
@@ -79,11 +90,15 @@ const Separator = () => <div className="s-card-separator" />;
 function Permission({ kind, on }: { kind: PermissionKind; on: boolean }) {
   return (
     <Row title={t(`permission.${kind}`)} hint={t(`permission.${kind}Note`)}>
-      {on ? (
-        <span className="s-row-hint">{t("permission.on")}</span>
-      ) : (
+      {/* Why a dot and a word: "on" in grey text was easy to miss, so it was not clear which permission was off
+          (decision 2026-11-19 4C). */}
+      <span className={on ? "s-permission on" : "s-permission"}>
+        <span className="s-permission-dot" aria-hidden />
+        {t(on ? "permission.on" : "permission.off")}
+      </span>
+      {!on && (
         <button type="button" className="rw-button" onClick={() => void native.requestPermission(kind)}>
-          {t("permission.allow")}
+          {t("permission.openSettings")}
         </button>
       )}
     </Row>
@@ -145,15 +160,86 @@ function Log({ link }: { link: Link }) {
           {link.log.length === 0 ? (
             <Row title={t("log.empty")} />
           ) : (
-            link.log.slice(0, 30).map((entry, index) => (
+            link.log.slice(0, 100).map((entry, index) => (
               <div key={`${entry.at}-${entry.peer}-${entry.what}`}>
                 {index > 0 && <Separator />}
-                <Row title={logLine(entry)} />
+                <Row title={logLine(entry)}>{entry.by && <span className="s-by">{t(BY_KEY[entry.by])}</span>}</Row>
               </div>
             ))
           )}
         </div>
         <p className="s-section-hint">{t("log.subtitle")}</p>
+      </section>
+    </main>
+  );
+}
+
+/** The Claude tab: whether Claude Code on this Mac can use Remotrol, the apps Claude may click and type in without
+ *  asking, and what Claude did lately (decision 2026-11-19 3B). */
+function Claude() {
+  const [state, setState] = useState<ClaudeState | null>(null);
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    const check = () => void native.claudeState().then(setState);
+    check();
+    const timer = setInterval(check, EVERY_MS);
+    return () => clearInterval(timer);
+  }, []);
+  if (!state) return null;
+  const copy = () =>
+    void native.writeClipboard(state.command).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), EVERY_MS);
+    });
+  return (
+    <main className="s-content">
+      <section className="s-section">
+        <h2 className="s-section-title">{t("claude.connect")}</h2>
+        <div className="s-card">
+          <Row title={t(state.registered ? "claude.connected" : "claude.notConnected")} hint={t(state.registered ? "claude.connectHint" : "claude.copyHint")}>
+            <span className={state.registered ? "s-permission on" : "s-permission"}>
+              <span className="s-permission-dot" aria-hidden />
+            </span>
+            <button type="button" className="rw-button" onClick={copy}>
+              {t(copied ? "claude.copied" : "claude.copyCommand")}
+            </button>
+          </Row>
+        </div>
+      </section>
+      <section className="s-section">
+        <h2 className="s-section-title">{t("claude.appsTitle")}</h2>
+        <div className="s-card">
+          {state.apps.length === 0 ? (
+            <Row title={t("claude.appsEmpty")} />
+          ) : (
+            state.apps.map((app, index) => (
+              <div key={app.id}>
+                {index > 0 && <Separator />}
+                <Row title={app.name} hint={app.name === app.id ? undefined : app.id}>
+                  <button type="button" className="rw-button" onClick={() => void native.removeClaudeApp(app.id).then(setState)}>
+                    {t("claude.remove")}
+                  </button>
+                </Row>
+              </div>
+            ))
+          )}
+        </div>
+        <p className="s-section-hint">{t("claude.appsHint")}</p>
+      </section>
+      <section className="s-section">
+        <h2 className="s-section-title">{t("claude.doneTitle")}</h2>
+        <div className="s-card">
+          {state.log.length === 0 ? (
+            <Row title={t("claude.doneEmpty")} />
+          ) : (
+            state.log.slice(0, 30).map((entry, index) => (
+              <div key={`${entry.at}-${entry.computer}-${entry.what}`}>
+                {index > 0 && <Separator />}
+                <Row title={`${when(entry.at)}  ${t(`claude.done.${entry.what}`, { computer: entry.computer })}`} />
+              </div>
+            ))
+          )}
+        </div>
       </section>
     </main>
   );
@@ -328,6 +414,7 @@ export default function Settings() {
       <div className="settings-body">
         {tab === "mac" && status && link && <ThisMac status={status} link={link} onLink={setLink} />}
         {tab === "log" && link && <Log link={link} />}
+        {tab === "claude" && <Claude />}
         {tab === "general" && <General />}
         {tab === "account" && link && <Account link={link} onLink={setLink} />}
         {tab === "about" && (

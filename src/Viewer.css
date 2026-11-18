@@ -385,19 +385,31 @@
   overflow-y: auto;
 }
 
-/* This Mac's line at the bottom of the grid, and its page. */
-.this-mac {
-  font: inherit;
-  color: var(--ink);
+/* The "This computer" line: the part that opens Settings is one button, and Disconnect sits beside it while someone
+   is watching (a button cannot hold another button). */
+.this-mac-box {
   flex-direction: row;
   align-items: center;
   gap: 12px;
-  text-align: left;
-  cursor: pointer;
 }
 
-.this-mac:hover {
+.this-mac-box:has(.this-mac:hover) {
   border-color: var(--rw-primary);
+}
+
+.this-mac {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
 }
 
 .this-mac-text {
@@ -427,6 +439,12 @@
   color: var(--sub);
 }
 
+/* Why: while someone is watching the summary on the right is hidden, so the arrow keeps to the right on its own. */
+.this-mac .flip {
+  flex: none;
+  margin-left: auto;
+}
+
 .viewer-window.scroll {
   overflow-y: auto;
 }
@@ -452,19 +470,6 @@
 
 .state-dot.viewing {
   background: var(--r-warning);
-}
-
-.watching {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: var(--rw-radius);
-  background: color-mix(in srgb, var(--r-warning) 16%, transparent);
-}
-
-.watching > span:nth-child(2) {
-  flex: 1;
 }
 
 /* The RUNNERS account form, shown in place of the grid while signed out. */

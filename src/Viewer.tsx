@@ -8,7 +8,9 @@
 // The page also holds the WebRTC connections (./peer), which is why the window is made at launch and only hidden.
 //   - "This Mac" at the bottom of the grid opens this Mac's page: its permissions, the See This and Click and Type
 //     switches, Disconnect, the connection log and the two general settings (decision 「[REMOTE] 메뉴 막대 패널 정리」
-//     1C: there is no tray panel). While someone is watching, a bar with Disconnect sits on top of the grid.
+//     1C: there is no tray panel). While someone is watching, that line says who, with Disconnect beside it; there
+//     is no bar over the grid (decision 2026-11-19 1B: a bar that came and went whenever a computer had the grid open
+//     was the most asked-about thing). Computers seen before that are off now stay as grey tiles (4A).
 // On Windows and Linux it says Remote works on macOS only for now.
 import {
   useCallback,
@@ -234,7 +236,9 @@ export default function Viewer() {
         <div className="window-head-text">
           <div className="title">{t("grid.title")}</div>
           {/* Why only with computers: signed out, the card below says the same; with none, LinkNote says why. */}
-          {computers.length > 0 && <div className="subtitle">{t("grid.subtitle", { count: computers.length })}</div>}
+          {computers.length > 0 && (
+            <div className="subtitle">{t("grid.subtitle", { count: computers.filter((c) => c.online).length })}</div>
+          )}
         </div>
         {link?.account && (
           <AccountButton
@@ -259,15 +263,6 @@ export default function Viewer() {
           />
         )}
       </header>
-      {status && status.viewers.length > 0 && (
-        <div className="watching">
-          <span className="state-dot viewing" aria-hidden />
-          <span>{t("status.viewers", { names: status.viewers.join(", ") })}</span>
-          <button type="button" className="rw-button" onClick={() => void native.disconnect().then(setLink)}>
-            {t("menu.disconnect")}
-          </button>
-        </div>
-      )}
       {signedOut ? (
         <section className="card signed-out">
           {/* Empty screens are picture, one line, one button, as in the design guide (design.runners.im/states 06-2). */}
@@ -291,21 +286,33 @@ export default function Viewer() {
         </div>
       )}
       {status && (
-        <button type="button" className="card this-mac" onClick={() => native.openSettings("mac")}>
-          <Laptop size={16} strokeWidth={1.5} aria-hidden />
-          <span className="this-mac-text">
-            <span className="switch-label">
-              {t("thisMac.title")} · {status.computer}
+        <div className="card this-mac-box">
+          <button type="button" className="this-mac" onClick={() => native.openSettings("mac")}>
+            <Laptop size={16} strokeWidth={1.5} aria-hidden />
+            <span className="this-mac-text">
+              <span className="switch-label">
+                {t("thisMac.title")} · {status.computer}
+              </span>
+              <span className="hint">
+                <span className={`state-dot ${status.state}`} aria-hidden />{" "}
+                {status.viewers.length > 0
+                  ? t("status.viewers", { names: status.viewers.join(", ") })
+                  : statusText(status.state, status.reason)}
+              </span>
             </span>
-            <span className="hint">
-              <span className={`state-dot ${status.state}`} aria-hidden /> {statusText(status.state, status.reason)}
-            </span>
-          </span>
-          <span className="hint this-mac-summary" title={t("thisMac.summary")}>
-            {t("thisMac.summary")}
-          </span>
-          <ChevronLeft className="flip" size={14} strokeWidth={1.5} aria-hidden />
-        </button>
+            {status.viewers.length === 0 && (
+              <span className="hint this-mac-summary" title={t("thisMac.summary")}>
+                {t("thisMac.summary")}
+              </span>
+            )}
+            <ChevronLeft className="flip" size={14} strokeWidth={1.5} aria-hidden />
+          </button>
+          {status.viewers.length > 0 && (
+            <button type="button" className="rw-button" onClick={() => void native.disconnect().then(setLink)}>
+              {t("menu.disconnect")}
+            </button>
+          )}
+        </div>
       )}
       {signingIn && (
         <SignInSheet
@@ -318,6 +325,15 @@ export default function Viewer() {
       )}
     </main>
   );
+}
+
+/** How long ago, in the window's language ("3 hours ago"), for a computer that is off now. */
+function ago(at: number): string {
+  const minutes = Math.max(1, Math.round((Date.now() - at) / 60_000));
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (minutes < 60) return format.format(-minutes, "minute");
+  if (minutes < 48 * 60) return format.format(-Math.round(minutes / 60), "hour");
+  return format.format(-Math.round(minutes / 1440), "day");
 }
 
 /** One computer in the grid: a small picture of its main display, its name, and a word when it cannot be seen. */
@@ -389,6 +405,7 @@ function Tile({ computer, visible, onOpen }: { computer: Computer; visible: bool
         {/* Why the words: a dot alone does not say what it means (runners-wiki 2026-11-15 3B). */}
         <span className="tab-badge">
           {t(computer.online ? "computer.online" : "computer.offline")}
+          {!computer.online && computer.lastSeen !== undefined && ` · ${ago(computer.lastSeen)}`}
           {monitors > 1 && ` · ${t("grid.monitors", { count: monitors })}`}
         </span>
       </div>
