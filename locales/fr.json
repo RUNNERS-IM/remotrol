@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Refusé",
   "update.done": "Mis à jour vers {{version}}",
   "update.showNotes": "Voir les nouveautés",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "Pseudo",
+  "account.nicknameHint": "Affiché à côté du panda et dans les autres apps RUNNERS. Laissez vide pour utiliser la partie de l’e-mail avant @.",
+  "account.nicknameLong": "Un pseudo peut contenir 30 caractères au maximum.",
+  "account.save": "Enregistrer",
+  "account.saved": "Enregistré"
 }

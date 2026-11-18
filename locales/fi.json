@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Torjuttu",
   "update.done": "Päivitetty versioon {{version}}",
   "update.showNotes": "Katso uutta",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "Lempinimi",
+  "account.nicknameHint": "Näkyy pandan vieressä ja muissa RUNNERS-apeissa. Jätä tyhjäksi, niin käytetään sähköpostin @-merkkiä edeltävää osaa.",
+  "account.nicknameLong": "Lempinimessä voi olla enintään 30 merkkiä.",
+  "account.save": "Tallenna",
+  "account.saved": "Tallennettu"
 }

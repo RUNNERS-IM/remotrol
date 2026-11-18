@@ -50,6 +50,7 @@ export const sendCode = (purpose: "signup" | "reset", email: string) => api().se
 export const resetPassword = (email: string, code: string, password: string) =>
   api().resetPassword(email, code, password);
 export const signOut = () => api().signOut();
+export const setNickname = (name: string) => api().setNickname(name);
 export const setAllow = (what: Allow, on: boolean) => api().setAllow(what, on);
 export const disconnect = () => api().disconnect();
 export const claudeState = () => api().claudeState();

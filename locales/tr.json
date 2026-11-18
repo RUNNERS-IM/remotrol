@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Reddedildi",
   "update.done": "{{version}} sürümüne güncellendi",
   "update.showNotes": "Yenilikleri gör",
-  "update.ok": "Tamam"
+  "update.ok": "Tamam",
+  "account.nickname": "Takma ad",
+  "account.nicknameHint": "Pandanın yanında ve diğer RUNNERS uygulamalarında görünür. E-postanın @ öncesini kullanmak için boş bırakın.",
+  "account.nicknameLong": "Takma ad en fazla 30 karakter olabilir.",
+  "account.save": "Kaydet",
+  "account.saved": "Kaydedildi"
 }

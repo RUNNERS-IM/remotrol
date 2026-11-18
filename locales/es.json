@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Rechazado",
   "update.done": "Actualizado a {{version}}",
   "update.showNotes": "Ver novedades",
-  "update.ok": "Aceptar"
+  "update.ok": "Aceptar",
+  "account.nickname": "Apodo",
+  "account.nicknameHint": "Se muestra junto al panda y en las demás apps de RUNNERS. Déjalo vacío para usar la parte del correo antes de @.",
+  "account.nicknameLong": "El apodo puede tener hasta 30 caracteres.",
+  "account.save": "Guardar",
+  "account.saved": "Guardado"
 }

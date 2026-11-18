@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Refused",
   "update.done": "Updated to {{version}}",
   "update.showNotes": "See What’s New",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "Nickname",
+  "account.nicknameHint": "Shown beside the panda and in the other RUNNERS apps. Leave it empty to use the part of your email before @.",
+  "account.nicknameLong": "A nickname can be up to 30 characters.",
+  "account.save": "Save",
+  "account.saved": "Saved"
 }

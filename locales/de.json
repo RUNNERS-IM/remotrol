@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Abgelehnt",
   "update.done": "Auf {{version}} aktualisiert",
   "update.showNotes": "Neuerungen anzeigen",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "Spitzname",
+  "account.nicknameHint": "Wird neben dem Panda und in den anderen RUNNERS-Apps angezeigt. Leer lassen, um den Teil der E-Mail vor @ zu verwenden.",
+  "account.nicknameLong": "Ein Spitzname darf höchstens 30 Zeichen haben.",
+  "account.save": "Sichern",
+  "account.saved": "Gesichert"
 }

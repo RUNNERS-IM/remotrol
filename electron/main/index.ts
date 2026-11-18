@@ -288,6 +288,7 @@ function registerIpc(): void {
     link.resetPassword(String(email), String(code), String(password)),
   );
   ipcMain.handle("remote:signOut", () => link.signOut());
+  ipcMain.handle("remote:setNickname", (_event, name: unknown) => link.setNickname(String(name ?? "")));
   ipcMain.handle("remote:setAllow", (_event, what: Allow, on: boolean) => {
     if (what === "allowViewing") link.setAllow(what, Boolean(on));
     return link.current();

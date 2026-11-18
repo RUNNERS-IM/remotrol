@@ -21,6 +21,7 @@ const api: RemoteApi = {
   sendCode: (purpose, email) => ipcRenderer.invoke("remote:sendCode", purpose, email),
   resetPassword: (email, code, password) => ipcRenderer.invoke("remote:resetPassword", email, code, password),
   signOut: () => ipcRenderer.invoke("remote:signOut"),
+  setNickname: (name) => ipcRenderer.invoke("remote:setNickname", name),
   setAllow: (what, on) => ipcRenderer.invoke("remote:setAllow", what, on),
   disconnect: () => ipcRenderer.invoke("remote:disconnect"),
   claudeState: () => ipcRenderer.invoke("remote:claudeState"),

@@ -114,6 +114,10 @@ export type Link = {
   error: string | null;
   /** The signed-in account's email, or null. */
   account: string | null;
+  /** The name beside the panda: chosen by the person, else the email's first part; null signed out (decision 2B). */
+  nickname: string | null;
+  /** Whether the person chose the nickname. */
+  customNickname: boolean;
   computers: Computer[];
   allowViewing: boolean;
   /** Newest first. */
@@ -171,6 +175,8 @@ export type RemoteApi = {
   /** Sets a new password with the mailed code and signs in. */
   resetPassword: (email: string, code: string, password: string) => Promise<Link>;
   signOut: () => Promise<Link>;
+  /** Saves the nickname (empty goes back to the email's first part). Rejects with `format` past 30 characters. */
+  setNickname: (name: string) => Promise<Link>;
   /** Turns letting others see or click in this computer on or off. */
   setAllow: (what: Allow, on: boolean) => Promise<Link>;
   /** Stops everyone looking now and turns seeing off until it is turned on again. */

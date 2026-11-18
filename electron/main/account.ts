@@ -52,6 +52,27 @@ export function email(): string | null {
   return kitAccount().current();
 }
 
+/** The name shown beside the panda: the one the person chose, else the part of the email before @; null signed out. */
+export function nickname(): string | null {
+  return kitAccount().nickname();
+}
+
+/** Whether the person chose the nickname (rather than it being the part of the email before @). */
+export function customNickname(): boolean {
+  return kitAccount().customNickname();
+}
+
+/** Reads the nickname from the account server. Fails quietly while the server has no profile yet (kit 0.1.47). */
+export function loadProfile(): Promise<void> {
+  return kitAccount().loadProfile();
+}
+
+/** Saves a nickname for all RUNNERS apps; an empty one goes back to the email's first part. Throws `format` past 30
+ *  characters; anything else reads as "could not reach the server". */
+export function setNickname(name: string): Promise<string> {
+  return kitAccount().setNickname(name);
+}
+
 export function accessToken(): string | null {
   return kitAccount().accessToken();
 }

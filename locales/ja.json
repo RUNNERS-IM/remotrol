@@ -173,5 +173,10 @@
   "claude.done.refused": "{{computer}} · 拒否",
   "update.done": "{{version}} にアップデートしました",
   "update.showNotes": "変更点を見る",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "ニックネーム",
+  "account.nicknameHint": "パンダの横とほかの RUNNERS アプリに表示される名前です。空にするとメールの @ より前を使います。",
+  "account.nicknameLong": "ニックネームは30文字までです。",
+  "account.save": "保存",
+  "account.saved": "保存しました"
 }
