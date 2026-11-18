@@ -1,131 +1,55 @@
-// Keeps Remotrol up to date from the GitHub release (electron-updater, RUNNERS-IM/remotrol): checks once a day,
-// first about a minute after launch. A new version is downloaded first and only then does Remote ask, so "Install Now"
-// restarts at once (the shared rule for all RUNNERS apps). Release builds only: a dev run is not a signed build,
-// so it has nothing to compare with or install.
+// Keeps Remotrol up to date from the GitHub release (electron-updater, RUNNERS-IM/remotrol) with runners-app-kit's
+// createUpdates: checks once a day, first about a minute after launch, and downloads a new version at once. With
+// automatic updates on (the default) it installs without asking after 10 minutes with no keyboard or mouse use, or
+// when Remotrol quits, and says so once at the next launch (shared decision 2026-11-19 1A 2A). While another computer
+// or phone is watching this screen it waits, so nobody's remote session is cut off by a restart. With them off it
+// asks after downloading, as before. Release builds only: a dev run is not a signed build, so it has nothing to
+// compare with or install.
 import { app, dialog, powerMonitor } from "electron";
-import { autoUpdater, type ProgressInfo } from "electron-updater";
+import { autoUpdater } from "electron-updater";
 import { currentLocale, t } from "./i18n";
-import { releaseNoteLines } from "./releaseNotes";
+import { createUpdates } from "./runners/updates";
 import { readSettings, writeSettings } from "./settings";
 import * as keepAlive from "./keepAlive";
-import { allowClose, askUpdate, type UpdateAnswer } from "./windows";
+import * as status from "./status";
+import { allowClose, askUpdate } from "./windows";
 
-/** Wait after launch so a login start is not slowed down by the check. */
-const FIRST_CHECK_MS = 60_000;
-const CHECK_EVERY_MS = 24 * 60 * 60 * 1000;
-/** Why not one 24-hour timer: its count stops while the computer sleeps, so a laptop might never reach it. */
-const TICK_MS = 60 * 60 * 1000;
-
-let busy = false;
+const updates = createUpdates({
+  isPackaged: app.isPackaged,
+  autoUpdater,
+  onResume: (listener) => powerMonitor.on("resume", listener),
+  readSettings,
+  writeSettings,
+  locale: currentLocale,
+  t: (key, args) => t(key as Parameters<typeof t>[0], args),
+  askUpdate,
+  // Why allowClose: macOS closes every window before before-quit fires, and the Remotrol window only hides when
+  // closed, so without this the app never quits and the new build is never put in place. Why quitAsked: the
+  // installer starts the new build itself; Remotrol must not also be started again by keepAlive.
+  beforeInstall: () => {
+    allowClose();
+    keepAlive.quitAsked();
+  },
+  tell: async (message) => {
+    app.focus({ steal: true });
+    await dialog.showMessageBox({ type: "info", message, buttons: ["OK"] });
+  },
+  appVersion: () => app.getVersion(),
+  idleSeconds: () => powerMonitor.getSystemIdleTime(),
+  // Why: a restart would cut off whoever is looking at or clicking on this screen from another computer or phone.
+  isBusy: () => status.viewers().length > 0,
+});
 
 export function startUpdates(): void {
-  if (!app.isPackaged) return;
-  autoUpdater.autoDownload = false;
-  // Why: "What's new" shows the offered version's notes only, not those of versions in between.
-  autoUpdater.fullChangelog = false;
-  // Why: installing is only ever done after the person says yes, never silently on quit.
-  autoUpdater.autoInstallOnAppQuit = false;
-  autoUpdater.on("error", (error) => console.error("update:", error));
-  setTimeout(() => {
-    void checkIfDue();
-    setInterval(() => void checkIfDue(), TICK_MS);
-  }, FIRST_CHECK_MS);
-  powerMonitor.on("resume", () => setTimeout(() => void checkIfDue(), FIRST_CHECK_MS));
+  updates.start();
 }
 
-/** The daily check, when the last one that reached GitHub is a day old (or there was none). */
-async function checkIfDue(): Promise<void> {
-  if (Date.now() - (readSettings().updateCheckedAt ?? 0) < CHECK_EVERY_MS) return;
-  await check(false);
-}
-
-/** "Check for Updates…" in the menu: same check, but also says when Remote is already up to date. */
+/** "Check for Updates…" in the menu: same check, but also says when Remotrol is already up to date. */
 export function checkNow(): void {
-  void check(true);
-}
-
-async function check(asked: boolean): Promise<void> {
-  if (busy || (!asked && !readSettings().autoUpdate)) return;
-  busy = true;
-  try {
-    if (!app.isPackaged) throw new Error("a development build does not update");
-    const result = await autoUpdater.checkForUpdates();
-    writeSettings({ updateCheckedAt: Date.now() });
-    if (!result?.isUpdateAvailable) {
-      if (asked) await tell(t("update.latest"));
-      return;
-    }
-    // Why: "Later" means not again today; only the menu's "Check for Updates…" asks again the same day.
-    if (!asked && readSettings().updateLaterOn === today()) return;
-    const version = result.updateInfo.version.replace("+", ".");
-    const notes = releaseNoteLines(result.updateInfo.releaseNotes, currentLocale() === "ko" ? "ko" : "en");
-    const answer = asked ? await askWhileDownloading(version, notes) : await askAfterDownload(version, notes);
-    if (answer !== "install") {
-      writeSettings({ updateLaterOn: today() });
-      return;
-    }
-    // Why: Remote holds no unsaved work, so restarting right away is safe and puts the new build in place at once.
-    // Why allowClose first: macOS closes every window before before-quit fires, and the Remote window only hides when
-    // closed, so without this the app never quits and the new build is never put in place.
-    allowClose();
-    // Why: the installer starts the new build itself; Remote must not also be started again by keepAlive.
-    keepAlive.quitAsked();
-    autoUpdater.quitAndInstall(true, true);
-  } catch (error) {
-    if (asked) await tell(t("update.failed", { error: error instanceof Error ? error.message : String(error) }));
-  } finally {
-    busy = false;
-  }
-}
-
-/** The daily check: download quietly, and only then show the question (without taking focus). */
-async function askAfterDownload(version: string, notes: string[] | null): Promise<UpdateAnswer> {
-  await autoUpdater.downloadUpdate();
-  return askUpdate({ version, notes, downloading: false, percent: 100 }, false).answer;
-}
-
-/** The menu's "Check for Updates…": the person is waiting, so the window opens at once and shows the download.
- *  Escape or closing it during the download only hides it: the download carries on and the window comes back,
- *  ready to install, when it is done (shared rule, 1B). */
-async function askWhileDownloading(version: string, notes: string[] | null): Promise<UpdateAnswer> {
-  const prompt = askUpdate({ version, notes, downloading: true, percent: 0 }, true);
-  const progress = (info: ProgressInfo) => prompt.set({ percent: info.percent });
-  autoUpdater.on("download-progress", progress);
-  let done = false;
-  let failed: unknown = null;
-  // Why: electron-updater hands back the download already running, so a second check never downloads twice.
-  const download = autoUpdater
-    .downloadUpdate()
-    .then(() => {
-      done = true;
-      prompt.set({ downloading: false, percent: 100 });
-    })
-    .catch((error: unknown) => {
-      failed = error;
-      prompt.close();
-    })
-    .finally(() => autoUpdater.off("download-progress", progress));
-  const first = await prompt.answer;
-  if (failed) throw failed;
-  if (first === "install" || done) return first;
-  await download;
-  if (failed) throw failed;
-  // Why: shown without focus, so a Return typed elsewhere meanwhile cannot land on it.
-  return askUpdate({ version, notes, downloading: false, percent: 100 }, false).answer;
-}
-
-async function tell(message: string): Promise<void> {
-  app.focus({ steal: true });
-  await dialog.showMessageBox({ type: "info", message, buttons: ["OK"] });
+  void updates.checkNow();
 }
 
 /** Version as people see it: a same-day build `2.6.1030+2` reads `2.6.1030.2`, like its release tag. */
 export function displayVersion(): string {
   return app.getVersion().replace("+", ".");
-}
-
-/** The local calendar day, as `2026-10-30`. */
-function today(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
