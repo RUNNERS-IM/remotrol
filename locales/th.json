@@ -172,6 +172,6 @@
   "claude.done.text": "{{computer}} · พิมพ์ข้อความ",
   "claude.done.refused": "{{computer}} · ถูกปฏิเสธ",
   "update.done": "อัปเดตเป็น {{version}} แล้ว",
-  "update.showNotes": "ดูสิ่งที่เปลี่ยน",
+  "update.showNotes": "ดูสิ่งใหม่",
   "update.ok": "ตกลง"
 }

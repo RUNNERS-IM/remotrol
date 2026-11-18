@@ -171,7 +171,7 @@
   "claude.done.key": "{{computer}} · 按鍵",
   "claude.done.text": "{{computer}} · 輸入文字",
   "claude.done.refused": "{{computer}} · 已拒絕",
-  "update.done": "已更新到 {{version}}",
+  "update.done": "已更新至 {{version}}",
   "update.showNotes": "查看新功能",
   "update.ok": "好"
 }

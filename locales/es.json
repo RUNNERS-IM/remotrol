@@ -175,5 +175,5 @@
   "claude.done.refused": "{{computer}} · Rechazado",
   "update.done": "Actualizado a {{version}}",
   "update.showNotes": "Ver novedades",
-  "update.ok": "OK"
+  "update.ok": "Aceptar"
 }

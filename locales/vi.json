@@ -172,6 +172,6 @@
   "claude.done.text": "{{computer}} · Gõ chữ",
   "claude.done.refused": "{{computer}} · Bị từ chối",
   "update.done": "Đã cập nhật lên {{version}}",
-  "update.showNotes": "Xem điểm mới",
+  "update.showNotes": "Xem có gì mới",
   "update.ok": "OK"
 }

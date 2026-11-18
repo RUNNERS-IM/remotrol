@@ -181,6 +181,6 @@
   "claude.done.text": "{{computer}} · Ввод текста",
   "claude.done.refused": "{{computer}} · Отказано",
   "update.done": "Обновлено до {{version}}",
-  "update.showNotes": "Что нового",
+  "update.showNotes": "Посмотреть, что нового",
   "update.ok": "ОК"
 }

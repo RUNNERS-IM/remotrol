@@ -172,6 +172,6 @@
   "claude.done.text": "{{computer}} · 文字入力",
   "claude.done.refused": "{{computer}} · 拒否",
   "update.done": "{{version}} にアップデートしました",
-  "update.showNotes": "新機能を見る",
+  "update.showNotes": "変更点を見る",
   "update.ok": "OK"
 }

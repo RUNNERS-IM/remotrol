@@ -180,6 +180,6 @@
   "claude.done.text": "{{computer}} · Wpisywanie",
   "claude.done.refused": "{{computer}} · Odrzucono",
   "update.done": "Zaktualizowano do {{version}}",
-  "update.showNotes": "Zobacz nowości",
+  "update.showNotes": "Zobacz, co nowego",
   "update.ok": "OK"
 }
