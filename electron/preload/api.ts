@@ -13,7 +13,7 @@ export type MenuCommand =
   | "quit";
 
 /** The tabs of the Settings window. */
-export type SettingsTab = "mac" | "log" | "general" | "account" | "about";
+export type SettingsTab = "mac" | "log" | "general" | "claude" | "account" | "about";
 
 /** `linked` is false until this computer is on the relay (signed in and connected); the two Allow lines show only after
  *  that. */
@@ -29,7 +29,7 @@ export type MenuState = {
 
 /** The update window's content: new version as people see it, the "What's new" lines (null hides the box) and the
  *  download's progress while it is still downloading. */
-export type UpdateOffer = { version: string; notes: string[] | null; downloading: boolean; percent: number };
+export type UpdateOffer = { version: string; notes: string[] | null; downloading: boolean; percent: number; installed?: boolean };
 
 export type Permissions = { screenRecording: boolean; accessibility: boolean };
 
@@ -82,7 +82,9 @@ export type Input =
 
 /** One computer of the same RUNNERS account that has Remote open. `host` is its device id on the relay, used to reach
  *  it. */
-export type Computer = { name: string; host: string; online: boolean; os: string };
+/** One computer of the same RUNNERS account. `lastSeen` (ms since 1970) is set for one that is off now but was seen
+ *  before, so the grid keeps it as a grey tile (decision 2026-11-19 4A). */
+export type Computer = { name: string; host: string; online: boolean; os: string; lastSeen?: number };
 
 /** The connection: not signed in to a RUNNERS account, starting, running, or failed (the reason is in `error`; it
  *  tries again by itself). */
@@ -90,7 +92,22 @@ export type LinkState = "signedOut" | "starting" | "running" | "failed";
 
 /** One line of the connection log: who did what to this computer, and when (ms since 1970). `refused` is a request
  *  turned away because seeing or clicking was off. Typed text itself is never written down. */
-export type LogEntry = { at: number; peer: string; what: "view" | "click" | "key" | "text" | "copy" | "paste" | "refused" };
+export type LogEntry = {
+  at: number;
+  peer: string;
+  what: "view" | "click" | "key" | "text" | "copy" | "paste" | "refused";
+  /** Who on that device: a person at a computer, a phone, or a Claude session there. Older entries leave it out. */
+  by?: "computer" | "phone" | "claude";
+};
+
+/** The Claude tab: whether Claude Code has Remotrol's tools, the apps Claude may act in without asking, and what
+ *  Claude on this computer did (newest first). */
+export type ClaudeState = {
+  registered: boolean;
+  command: string;
+  apps: { id: string; name: string }[];
+  log: { at: number; computer: string; what: "view" | "click" | "key" | "text" | "refused" }[];
+};
 
 export type Link = {
   state: LinkState;
@@ -158,6 +175,10 @@ export type RemoteApi = {
   setAllow: (what: Allow, on: boolean) => Promise<Link>;
   /** Stops everyone looking now and turns seeing off until it is turned on again. */
   disconnect: () => Promise<Link>;
+  /** The Claude tab in Settings. */
+  claudeState: () => Promise<ClaudeState>;
+  /** Takes an app off the list Claude may act in without asking. */
+  removeClaudeApp: (id: string) => Promise<ClaudeState>;
   /** This computer's id on the relay. */
   deviceId: () => Promise<string>;
   /** Passes a WebRTC signal to another device of the account. */

@@ -8,7 +8,7 @@ import { hostname, uptime, userInfo } from "node:os";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import type { Allow, Input, PermissionKind, PressAt, SettingsTab } from "../preload/api";
-import { startClaude } from "./claude";
+import { claudeState, removeClaudeApp, startClaude } from "./claude";
 import * as input from "./input";
 import * as keepAlive from "./keepAlive";
 import * as link from "./link";
@@ -292,6 +292,8 @@ function registerIpc(): void {
     if (what === "allowViewing") link.setAllow(what, Boolean(on));
     return link.current();
   });
+  ipcMain.handle("remote:claudeState", () => claudeState());
+  ipcMain.handle("remote:removeClaudeApp", (_event, id: unknown) => removeClaudeApp(String(id)));
   ipcMain.handle("remote:disconnect", () => {
     link.disconnect();
     return link.current();
