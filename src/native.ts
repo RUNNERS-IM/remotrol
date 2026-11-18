@@ -2,6 +2,7 @@
 // (electron/preload). Everything the page asks of the main process goes through here.
 import type {
   Allow,
+  ClaudeState,
   Computer,
   Display,
   Input,
@@ -27,7 +28,7 @@ declare global {
 
 const api = () => window.remote;
 
-export type { Allow, Computer, Display, Input, Link, LogEntry, PeerInfo, MenuCommand, MenuState, PermissionKind, Permissions, SettingsTab, Status, UpdateOffer };
+export type { Allow, ClaudeState, Computer, Display, Input, Link, LogEntry, PeerInfo, MenuCommand, MenuState, PermissionKind, Permissions, SettingsTab, Status, UpdateOffer };
 
 /** Which window this page is: the Remote window, the panel, Settings or the update question. */
 export const page: "viewer" | "panel" | "settings" | "update" =
@@ -51,6 +52,8 @@ export const resetPassword = (email: string, code: string, password: string) =>
 export const signOut = () => api().signOut();
 export const setAllow = (what: Allow, on: boolean) => api().setAllow(what, on);
 export const disconnect = () => api().disconnect();
+export const claudeState = () => api().claudeState();
+export const removeClaudeApp = (id: string) => api().removeClaudeApp(id);
 export const onViewerVisible = (listener: (visible: boolean) => void) => api().onViewerVisible(listener);
 export const fitHeight = (height: number) => api().fitHeight(height);
 export const version = () => api().version();

@@ -13,6 +13,8 @@
 // clicking is a bigger trust step, so it starts off. Disconnect turns seeing off, which also stops clicking.
 import { app, clipboard, desktopCapturer, ipcMain, nativeImage, type WebContents } from "electron";
 import { randomUUID } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import type { Allow, Computer, Display, Input, Link, LogEntry, PeerInfo } from "../preload/api";
 import * as account from "./account";
 import { native } from "./native";
@@ -23,6 +25,14 @@ import * as status from "./status";
 
 const DEV = !app.isPackaged;
 const LOG_KEEP = 200;
+/** How long the connection log is kept on disk (decision 2026-11-19 4D), so it is still there after a restart. */
+const LOG_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const LOG_SAVE_MS = 2000;
+/** A computer not seen for this long leaves the grid's grey tiles. */
+const KNOWN_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+/** A still picture asked this narrow is a grid tile, not someone looking: it does not count as viewing, so the
+ *  "seen by" line does not blink on and off while another computer only has the grid open (decision 2026-11-19 1B). */
+const TILE_MAX_WIDTH = 640;
 const ASK_TIMEOUT_MS = 15_000;
 /** Narrowest and widest still picture a caller may ask for with `width`; the grid asks for small ones. */
 const MIN_WIDTH = 160;
@@ -47,10 +57,65 @@ let fakeClipboard = "";
 
 const log: LogEntry[] = [];
 let page: () => WebContents | null = () => null;
+let saveTimer: NodeJS.Timeout | null = null;
 
-function note(peer: string, what: LogEntry["what"]): void {
-  log.unshift({ at: Date.now(), peer, what });
+function logFile(): string {
+  return join(app.getPath("userData"), "connection-log.json");
+}
+
+function loadLog(): void {
+  try {
+    const since = Date.now() - LOG_DAYS_MS;
+    const saved = JSON.parse(readFileSync(logFile(), "utf8")) as LogEntry[];
+    log.push(...saved.filter((entry) => entry.at > since).slice(0, LOG_KEEP));
+  } catch {
+    // No log yet, or an unreadable one: start empty.
+  }
+}
+
+function saveLog(): void {
+  saveTimer = null;
+  const since = Date.now() - LOG_DAYS_MS;
+  try {
+    mkdirSync(app.getPath("userData"), { recursive: true });
+    writeFileSync(logFile(), JSON.stringify(log.filter((entry) => entry.at > since)));
+  } catch (error) {
+    console.error("connection log:", error instanceof Error ? error.message : error);
+  }
+}
+
+function note(peer: string, what: LogEntry["what"], by?: LogEntry["by"]): void {
+  log.unshift({ at: Date.now(), peer, what, ...(by ? { by } : {}) });
   log.length = Math.min(log.length, LOG_KEEP);
+  saveTimer ??= setTimeout(saveLog, LOG_SAVE_MS);
+}
+
+/** Who on the asking device: phones join the relay only as viewers; a Claude session there marks its requests. */
+function byOf(peer: relay.Device, params: Record<string, unknown>): LogEntry["by"] {
+  if (params.by === "claude") return "claude";
+  return peer.role === "viewer" ? "phone" : "computer";
+}
+
+/** Computers seen before, by device id, kept for the grid's grey tiles. Saved only when one comes or goes. */
+type Known = { account: string | null; computers: Record<string, { name: string; lastSeen: number }> };
+let known: Known | null = null;
+let onlineBefore = "";
+
+function knownFile(): string {
+  return join(app.getPath("userData"), "computers.json");
+}
+
+function knownFor(email: string | null): Known {
+  if (!known) {
+    try {
+      known = JSON.parse(readFileSync(knownFile(), "utf8")) as Known;
+    } catch {
+      known = { account: email, computers: {} };
+    }
+  }
+  // Why: another account's computers are not this account's; signing in with another one starts over.
+  if (known.account !== email) known = { account: email, computers: {} };
+  return known;
 }
 
 // ---- What other devices ask of this computer ----
@@ -123,32 +188,34 @@ async function hostRequest(peerId: string, method: string, params: Record<string
   const now = status.current();
 
   if (method === "info") return info();
+  const by = byOf(peer, params);
   if (!settings.allowViewing) {
-    if (method === "frame" || method === "watch" || method === "input") note(peer.name, "refused");
+    if (method === "frame" || method === "watch" || method === "input") note(peer.name, "refused", by);
     throw new Error("off");
   }
   if (method === "front") return status.SUPPORTED ? JSON.parse(native.frontApp()) : null;
   if (method === "viewing") {
-    if (status.remoteFrameSent(peer.name)) note(peer.name, "view");
+    if (status.remoteFrameSent(peer.name)) note(peer.name, "view", by);
     return true;
   }
   if (method === "frame") {
     if (FAKE_SCREEN) return shrink(fakePicture(), params.width);
     if (!status.SUPPORTED) throw new Error("unsupported");
     const jpeg = await screens.capture(Number(params.display));
-    if (status.remoteFrameSent(peer.name)) note(peer.name, "view");
+    const tile = typeof params.width === "number" && params.width <= TILE_MAX_WIDTH;
+    if (!tile && status.remoteFrameSent(peer.name)) note(peer.name, "view", by);
     return shrink(jpeg, params.width);
   }
   if (method === "watch") {
     if (FAKE_SCREEN) return { fake: true };
     if (!status.SUPPORTED) throw new Error("unsupported");
     if (!now.permissions.screenRecording) throw new Error("permission");
-    if (status.remoteFrameSent(peer.name)) note(peer.name, "view");
+    if (status.remoteFrameSent(peer.name)) note(peer.name, "view", by);
     return { sourceId: await sourceFor(Number(params.display)) };
   }
   if (method === "input") {
     if (!settings.allowViewing) {
-      note(peer.name, "refused");
+      note(peer.name, "refused", by);
       throw new Error("control");
     }
     const input = params.input as Input;
@@ -159,13 +226,13 @@ async function hostRequest(peerId: string, method: string, params: Record<string
       screens.sendInput(input);
     }
     const kind = logKind(input);
-    if (kind) note(peer.name, kind);
+    if (kind) note(peer.name, kind, by);
     return "sent";
   }
   // Copy and paste with the computer on screen: only while it lets others see it, like the keys that copy.
   if (method === "clipboardGet" || method === "clipboardSet") {
     if (!settings.allowViewing) {
-      note(peer.name, "refused");
+      note(peer.name, "refused", by);
       throw new Error("control");
     }
     if (method === "clipboardSet") {
@@ -174,10 +241,10 @@ async function hostRequest(peerId: string, method: string, params: Record<string
         fakeClipboard = text;
         console.log("clipboard set:", text);
       } else clipboard.writeText(text);
-      note(peer.name, "paste");
+      note(peer.name, "paste", by);
       return "sent";
     }
-    note(peer.name, "copy");
+    note(peer.name, "copy", by);
     return FAKE_INPUT ? fakeClipboard || "fake copied text" : clipboard.readText();
   }
   throw new Error(`unknown method ${method}`);
@@ -216,7 +283,8 @@ export async function peerInfo(host: string): Promise<PeerInfo> {
 }
 
 export async function peerCapture(host: string, display: number, width?: number): Promise<Buffer> {
-  const bytes = (await askPage(host, "frame", { display, width })) as Uint8Array;
+  // Why `by`: the other computer's connection log says it was Claude, not the person at this computer.
+  const bytes = (await askPage(host, "frame", { display, width, by: "claude" })) as Uint8Array;
   return Buffer.from(bytes);
 }
 
@@ -225,7 +293,7 @@ export async function peerFront(host: string): Promise<{ bundleId: string; name:
 }
 
 export async function peerInput(host: string, input: Input): Promise<void> {
-  await askPage(host, "input", { input });
+  await askPage(host, "input", { input, by: "claude" });
 }
 
 // ---- State for the window and the menu ----
@@ -238,9 +306,10 @@ export function hasServer(): boolean {
 export async function current(): Promise<Link> {
   const now = relay.current();
   const settings = readSettings();
-  const computers: Computer[] = now.devices
+  const online: Computer[] = now.devices
     .filter((d) => d.role === "host")
     .map((d) => ({ name: d.name, host: d.deviceId, online: true, os: "" }));
+  const computers = withKnown(online, account.email(), now.state === "running");
   return {
     state: now.state,
     error: now.error,
@@ -249,6 +318,31 @@ export async function current(): Promise<Link> {
     allowViewing: settings.allowViewing,
     log: log.slice(0, 50),
   };
+}
+
+/** Adds the computers seen before that are off now, as grey tiles with when they were last seen. While the relay is
+ *  not running, nobody is known to be on or off, so nothing is added and nothing is marked as gone. */
+function withKnown(online: Computer[], email: string | null, running: boolean): Computer[] {
+  if (!email || !running) return online;
+  const book = knownFor(email);
+  const now = Date.now();
+  for (const c of online) book.computers[c.host] = { name: c.name, lastSeen: now };
+  const here = online.map((c) => c.host).sort().join(",");
+  if (here !== onlineBefore) {
+    onlineBefore = here;
+    for (const [host, seen] of Object.entries(book.computers)) if (now - seen.lastSeen > KNOWN_DAYS_MS) delete book.computers[host];
+    try {
+      writeFileSync(knownFile(), JSON.stringify(book));
+    } catch (error) {
+      console.error("known computers:", error instanceof Error ? error.message : error);
+    }
+  }
+  const on = new Set(online.map((c) => c.host));
+  const off = Object.entries(book.computers)
+    .filter(([host]) => !on.has(host))
+    .map(([host, seen]) => ({ name: seen.name, host, online: false, os: "", lastSeen: seen.lastSeen }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return [...online, ...off];
 }
 
 export function setAllow(what: Allow, on: boolean): void {
@@ -291,6 +385,13 @@ export async function signOut(): Promise<Link> {
 /** `contents` gives the page that holds the WebRTC connections (the Remote window, made hidden at launch). */
 export function startConnection(contents: () => WebContents | null): void {
   page = contents;
+  loadLog();
+  app.on("before-quit", () => {
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveLog();
+    }
+  });
   ipcMain.handle("remote:hostRequest", async (_event, peerId: string, method: string, params: Record<string, unknown>) =>
     hostRequest(String(peerId), String(method), params ?? {}),
   );

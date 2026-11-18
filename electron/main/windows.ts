@@ -223,8 +223,9 @@ export function showViewer(onHide: () => void): BrowserWindow {
 }
 
 /** What the update window shows: the new version (as people see it), its "What's new" lines (null hides the box) and,
- *  while it is still being downloaded, how far along it is (0–100). */
-export type UpdateOffer = { version: string; notes: string[] | null; downloading: boolean; percent: number };
+ *  while it is still being downloaded, how far along it is (0–100). `installed` is the note at the first launch after
+ *  installing by itself: "Updated to …" with only See What's New and OK. */
+export type UpdateOffer = { version: string; notes: string[] | null; downloading: boolean; percent: number; installed?: boolean };
 export type UpdateAnswer = "install" | "later";
 
 /** An open update window: its answer once a button is pressed (closing it is Later), and a way to change its state. */

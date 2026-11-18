@@ -7,8 +7,10 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-/** Marks that the one-time default was applied, so a later launch never turns it back on. */
-const DEFAULT_APPLIED = "open-at-login-default";
+/** Marks that the one-time default was applied, so a later launch never turns it back on. The "-2" applies it once
+ *  more on every computer (decision 2026-11-19 4A): the rename to Remotrol left Macs whose login item still named the
+ *  old Remote app, so after a restart Remotrol stayed closed and the grid showed nothing. */
+const DEFAULT_APPLIED = "open-at-login-default-2";
 /** Added to the login start on Windows and Linux, so Remote knows not to open its window (index.ts). */
 export const HIDDEN_ARG = "--hidden";
 const LINUX_AUTOSTART = join(homedir(), ".config", "autostart", "remote.desktop");

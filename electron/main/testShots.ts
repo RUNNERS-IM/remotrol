@@ -84,7 +84,7 @@ async function scenes(pass: TestShotPass, shotApp: ShotApp): Promise<void> {
   await pass.shot(viewer, "account", "로그인-오류");
   await press(viewer, ".ra-close");
 
-  const tabs: [SettingsTab, string][] = [["mac", "이-컴퓨터"], ["log", "연결-기록"], ["general", "일반"], ["account", "계정"], ["about", "정보"]];
+  const tabs: [SettingsTab, string][] = [["mac", "이-컴퓨터"], ["log", "연결-기록"], ["claude", "Claude"], ["general", "일반"], ["account", "계정"], ["about", "정보"]];
   for (const [tab, screen] of tabs) {
     shotApp.openSettings(tab);
     await pass.wait(1200);
@@ -116,6 +116,14 @@ async function scenes(pass: TestShotPass, shotApp: ShotApp): Promise<void> {
     await pass.wait(1500);
     const window = pageWindow("update");
     if (window) await pass.shot(window, "popups", downloading ? "업데이트-받는-중" : "업데이트");
+    prompt.close();
+  }
+  // The note at the first launch after installing by itself (kit 0.1.46).
+  {
+    const prompt = askUpdate({ version: "2.6.1102", notes: sampleUpdateNotes(), downloading: false, percent: 100, installed: true }, false);
+    await pass.wait(1500);
+    const window = pageWindow("update");
+    if (window) await pass.shot(window, "popups", "업데이트-했음");
     prompt.close();
   }
 
