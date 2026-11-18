@@ -171,7 +171,12 @@
   "claude.done.key": "{{computer}} · 按鍵",
   "claude.done.text": "{{computer}} · 輸入文字",
   "claude.done.refused": "{{computer}} · 已拒絕",
-  "update.done": "已更新到 {{version}}",
+  "update.done": "已更新至 {{version}}",
   "update.showNotes": "查看新功能",
-  "update.ok": "好"
+  "update.ok": "好",
+  "account.nickname": "暱稱",
+  "account.nicknameHint": "顯示在熊貓旁邊和其他 RUNNERS App 中的名字。留空則使用電子郵件 @ 前面的部分。",
+  "account.nicknameLong": "暱稱最多 30 個字元。",
+  "account.save": "儲存",
+  "account.saved": "已儲存"
 }

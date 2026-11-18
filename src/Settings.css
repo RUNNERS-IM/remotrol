@@ -204,3 +204,6 @@ html[data-window='settings'] body { background: var(--rw-window-bg); overflow: h
   height: 36px;
   object-fit: contain;
 }
+/* The nickname box in the Account tab (decision 2026-11-19 2B). */
+.s-nickname { width: 180px; }
+.s-row-hint.ra-error { color: var(--r-danger-text); }

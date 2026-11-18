@@ -186,5 +186,10 @@
   "claude.done.refused": "{{computer}} · مرفوض",
   "update.done": "تم التحديث إلى {{version}}",
   "update.showNotes": "عرض الجديد",
-  "update.ok": "حسنًا"
+  "update.ok": "حسنًا",
+  "account.nickname": "الاسم المستعار",
+  "account.nicknameHint": "يظهر بجانب الباندا وفي تطبيقات RUNNERS الأخرى. اتركه فارغًا لاستخدام الجزء الذي قبل @ في بريدك.",
+  "account.nicknameLong": "يمكن أن يصل الاسم المستعار إلى 30 حرفًا.",
+  "account.save": "حفظ",
+  "account.saved": "تم الحفظ"
 }

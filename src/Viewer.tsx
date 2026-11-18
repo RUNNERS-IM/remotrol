@@ -244,6 +244,7 @@ export default function Viewer() {
           <AccountButton
             lang={locale}
             account={link.account}
+            nickname={link.nickname}
             line={
               <>
                 <span className={`state-dot ${link.state === "running" ? "waiting" : ""}`} aria-hidden />

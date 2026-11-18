@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · मना किया",
   "update.done": "{{version}} पर अपडेट किया गया",
   "update.showNotes": "नया क्या है देखें",
-  "update.ok": "ठीक है"
+  "update.ok": "ठीक है",
+  "account.nickname": "उपनाम",
+  "account.nicknameHint": "पांडा के पास और दूसरे RUNNERS ऐप में दिखने वाला नाम। खाली छोड़ें तो ईमेल में @ से पहले का हिस्सा इस्तेमाल होगा।",
+  "account.nicknameLong": "उपनाम ज़्यादा से ज़्यादा 30 अक्षरों का हो सकता है।",
+  "account.save": "सहेजें",
+  "account.saved": "सहेजा गया"
 }

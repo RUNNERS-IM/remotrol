@@ -317,6 +317,64 @@ function General() {
   );
 }
 
+const NICKNAME_MAX = 30;
+
+/** The nickname row (decision 2026-11-19 2B): one name for all RUNNERS apps, kept on the account server. Saving an
+ *  empty box goes back to the part of the email before @. */
+function Nickname({ link, onLink }: { link: Link; onLink: (link: Link) => void }) {
+  const shown = link.customNickname ? (link.nickname ?? "") : "";
+  const [draft, setDraft] = useState(shown);
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "long" | "failed">("idle");
+  // Why: a nickname loaded from the server after the tab opened fills the box, unless the person is typing.
+  useEffect(() => {
+    if (state === "idle" || state === "saved") setDraft(shown);
+  }, [shown]); // eslint-disable-line react-hooks/exhaustive-deps
+  const changed = draft.trim() !== shown;
+  const save = () => {
+    if (draft.trim().length > NICKNAME_MAX) {
+      setState("long");
+      return;
+    }
+    setState("saving");
+    native.setNickname(draft).then(
+      (next) => {
+        onLink(next);
+        setState("saved");
+      },
+      (error: unknown) => setState(native.errorCode(error) === "format" ? "long" : "failed"),
+    );
+  };
+  const note = state === "long" ? t("account.nicknameLong") : state === "failed" ? t("account.network") : null;
+  return (
+    <div className="s-row">
+      <div className="s-row-line">
+        <div className="s-row-text">
+          <span className="s-row-title">{t("account.nickname")}</span>
+          <span className={note ? "s-row-hint ra-error" : "s-row-hint"}>{note ?? t("account.nicknameHint")}</span>
+        </div>
+        <div className="s-row-space" />
+        <div className="s-row-control">
+          <input
+            className="ra-field s-nickname"
+            value={draft}
+            maxLength={NICKNAME_MAX + 10}
+            placeholder={link.account?.split("@")[0] ?? ""}
+            aria-label={t("account.nickname")}
+            onChange={(event) => {
+              setDraft(event.target.value);
+              setState("idle");
+            }}
+            onKeyDown={(event) => event.key === "Enter" && changed && save()}
+          />
+          <button type="button" className="rw-button" disabled={!changed || state === "saving"} onClick={save}>
+            {t(state === "saved" && !changed ? "account.saved" : "account.save")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void }) {
   const [signingIn, setSigningIn] = useState(false);
   const closeSignIn = useCallback(() => setSigningIn(false), []);
@@ -335,6 +393,7 @@ function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void })
         <h2 className="s-section-title">{t("account.title")}</h2>
         <div className="s-card">
           {link.account ? (
+            <>
             <div className="s-row">
               <div className="s-row-line">
                 {/* Why the panda and not the email's first letter: the account button in the window shows the panda, and one
@@ -343,7 +402,8 @@ function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void })
                   <BadgePanda />
                 </span>
                 <div className="s-row-text">
-                  <span className="s-row-title">{link.account}</span>
+                  <span className="s-row-title">{link.nickname ?? link.account}</span>
+                  {link.nickname && <span className="s-row-hint">{link.account}</span>}
                 </div>
                 <div className="s-row-space" />
                 <button type="button" className="rw-button" onClick={() => void native.signOut().then(onLink)}>
@@ -351,6 +411,9 @@ function Account({ link, onLink }: { link: Link; onLink: (link: Link) => void })
                 </button>
               </div>
             </div>
+            <Separator />
+            <Nickname link={link} onLink={onLink} />
+            </>
           ) : (
             <div className="s-row">
               <div className="s-row-line">

@@ -314,6 +314,8 @@ export async function current(): Promise<Link> {
     state: now.state,
     error: now.error,
     account: account.email(),
+    nickname: account.nickname(),
+    customNickname: account.customNickname(),
     computers,
     allowViewing: settings.allowViewing,
     log: log.slice(0, 50),
@@ -375,6 +377,12 @@ export async function resetPassword(email: string, code: string, password: strin
   return current();
 }
 
+/** Decision 2026-11-19 2B: the nickname lives on the account server, so every RUNNERS app shows the same one. */
+export async function setNickname(name: string): Promise<Link> {
+  await account.setNickname(name);
+  return current();
+}
+
 export async function signOut(): Promise<Link> {
   page()?.send("remote:dropAll");
   await account.signOut();
@@ -386,6 +394,9 @@ export async function signOut(): Promise<Link> {
 export function startConnection(contents: () => WebContents | null): void {
   page = contents;
   loadLog();
+  // Why: a nickname changed in another RUNNERS app or on another computer shows here after the next launch. Signing
+  // in loads it by itself.
+  if (account.email()) void account.loadProfile().catch(() => {});
   app.on("before-quit", () => {
     if (saveTimer) {
       clearTimeout(saveTimer);

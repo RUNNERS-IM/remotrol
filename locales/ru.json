@@ -181,6 +181,11 @@
   "claude.done.text": "{{computer}} · Ввод текста",
   "claude.done.refused": "{{computer}} · Отказано",
   "update.done": "Обновлено до {{version}}",
-  "update.showNotes": "Что нового",
-  "update.ok": "ОК"
+  "update.showNotes": "Посмотреть, что нового",
+  "update.ok": "ОК",
+  "account.nickname": "Никнейм",
+  "account.nicknameHint": "Показывается рядом с пандой и в других приложениях RUNNERS. Оставьте пустым, чтобы использовать часть почты до @.",
+  "account.nicknameLong": "Никнейм может быть не длиннее 30 символов.",
+  "account.save": "Сохранить",
+  "account.saved": "Сохранено"
 }

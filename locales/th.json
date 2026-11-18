@@ -172,6 +172,11 @@
   "claude.done.text": "{{computer}} · พิมพ์ข้อความ",
   "claude.done.refused": "{{computer}} · ถูกปฏิเสธ",
   "update.done": "อัปเดตเป็น {{version}} แล้ว",
-  "update.showNotes": "ดูสิ่งที่เปลี่ยน",
-  "update.ok": "ตกลง"
+  "update.showNotes": "ดูสิ่งใหม่",
+  "update.ok": "ตกลง",
+  "account.nickname": "ชื่อเล่น",
+  "account.nicknameHint": "ชื่อที่แสดงข้างแพนด้าและในแอป RUNNERS อื่น เว้นว่างไว้เพื่อใช้ส่วนของอีเมลก่อน @",
+  "account.nicknameLong": "ชื่อเล่นยาวได้ไม่เกิน 30 ตัวอักษร",
+  "account.save": "บันทึก",
+  "account.saved": "บันทึกแล้ว"
 }

@@ -180,6 +180,11 @@
   "claude.done.text": "{{computer}} · Wpisywanie",
   "claude.done.refused": "{{computer}} · Odrzucono",
   "update.done": "Zaktualizowano do {{version}}",
-  "update.showNotes": "Zobacz nowości",
-  "update.ok": "OK"
+  "update.showNotes": "Zobacz, co nowego",
+  "update.ok": "OK",
+  "account.nickname": "Pseudonim",
+  "account.nicknameHint": "Widoczny obok pandy i w innych aplikacjach RUNNERS. Zostaw puste, aby użyć części adresu e-mail przed @.",
+  "account.nicknameLong": "Pseudonim może mieć najwyżej 30 znaków.",
+  "account.save": "Zapisz",
+  "account.saved": "Zapisano"
 }

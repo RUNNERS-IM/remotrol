@@ -175,5 +175,10 @@
   "claude.done.refused": "{{computer}} · Geweigerd",
   "update.done": "Bijgewerkt naar {{version}}",
   "update.showNotes": "Bekijk wat er nieuw is",
-  "update.ok": "OK"
+  "update.ok": "OK",
+  "account.nickname": "Bijnaam",
+  "account.nicknameHint": "Staat naast de panda en in de andere RUNNERS-apps. Laat leeg om het deel van je e-mail vóór @ te gebruiken.",
+  "account.nicknameLong": "Een bijnaam mag maximaal 30 tekens hebben.",
+  "account.save": "Bewaar",
+  "account.saved": "Bewaard"
 }
