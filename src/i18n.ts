@@ -48,3 +48,12 @@ export function statusText(state: "off" | "waiting" | "viewing", reason: "platfo
   if (reason) parts.push(t(`status.reason.${reason}`));
   return parts.join(" · ");
 }
+
+/** How long ago, in the window's language ("3 hours ago"), for a computer that is off now. */
+export function ago(at: number): string {
+  const minutes = Math.max(1, Math.round((Date.now() - at) / 60_000));
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (minutes < 60) return format.format(-minutes, "minute");
+  if (minutes < 48 * 60) return format.format(-Math.round(minutes / 60), "hour");
+  return format.format(-Math.round(minutes / 1440), "day");
+}

@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AppWindow, CircleHelp, Eye, EyeOff, LogIn, Monitor, Settings, SquareX, Unplug, type LucideIcon } from "lucide-react";
 import { MenuHead, MenuItem, MenuSeparator } from "./runners-account/runners-menu";
-import { statusText, t } from "./i18n";
+import { ago, statusText, t } from "./i18n";
 import * as native from "./native";
 import type { Link, Status } from "./native";
 import "./App.css";
@@ -60,10 +60,15 @@ export default function Panel() {
                   label={
                     <>
                       {computer.name}
-                      <span className="rm-sub">{t(computer.online ? "computer.online" : "computer.offline")}</span>
+                      <span className="rm-sub">
+                        {computer.online
+                          ? t("computer.online")
+                          : `${t("computer.offline")}${computer.lastSeen !== undefined ? ` · ${ago(computer.lastSeen)}` : ""}`}
+                      </span>
                     </>
                   }
-                  onSelect={() => native.openComputer(computer.host)}
+                  // Why: an off computer has no screen to open, so the grid opens, where its grey tile says when it was on.
+                  onSelect={() => (computer.online ? native.openComputer(computer.host) : void native.command("open"))}
                 />
               ))}
               <MenuItem icon={icon(AppWindow)} label={t("panel.openAll")} onSelect={() => void native.command("open")} />

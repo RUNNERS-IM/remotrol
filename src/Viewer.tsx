@@ -40,7 +40,7 @@ import {
   Type,
 } from "lucide-react";
 import { AccountButton, SignInSheet, type CodePurpose, type SignMode } from "./runners-account/runners-account";
-import { locale, statusText, t } from "./i18n";
+import { ago, locale, statusText, t } from "./i18n";
 import { keyInput } from "./keys";
 import * as native from "./native";
 import * as peer from "./peer";
@@ -326,15 +326,6 @@ export default function Viewer() {
       )}
     </main>
   );
-}
-
-/** How long ago, in the window's language ("3 hours ago"), for a computer that is off now. */
-function ago(at: number): string {
-  const minutes = Math.max(1, Math.round((Date.now() - at) / 60_000));
-  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  if (minutes < 60) return format.format(-minutes, "minute");
-  if (minutes < 48 * 60) return format.format(-Math.round(minutes / 60), "hour");
-  return format.format(-Math.round(minutes / 1440), "day");
 }
 
 /** One computer in the grid: a small picture of its main display, its name, and a word when it cannot be seen. */
