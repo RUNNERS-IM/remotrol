@@ -171,6 +171,26 @@ function logKind(input: Input): LogEntry["what"] | null {
   return null;
 }
 
+/** Every computer with the grid open asks for a tile every 2 seconds. Why one shared picture: each capture is a
+ *  ScreenCaptureKit request served by macOS's replayd, which was found holding 1 to 2.5 GB on Macs that had Remotrol
+ *  open for days, so seven askers make one capture instead of seven. A tile a second old looks the same; a large
+ *  picture (the screen view, Claude) is always taken new. */
+const TILE_SHARE_MS = 1500;
+const tileShots = new Map<number, { at: number; jpeg: Promise<Buffer> }>();
+
+function tilePicture(display: number): Promise<Buffer> {
+  const now = Date.now();
+  const last = tileShots.get(display);
+  if (last && now - last.at < TILE_SHARE_MS) return last.jpeg;
+  const jpeg = screens.capture(display);
+  tileShots.set(display, { at: now, jpeg });
+  // Why: a failed capture (permission off, display gone) is not shared, so the next ask tries again.
+  jpeg.catch(() => {
+    if (tileShots.get(display)?.jpeg === jpeg) tileShots.delete(display);
+  });
+  return jpeg;
+}
+
 /** The capture source Chromium needs for a display (macOS gives both the same display id). */
 async function sourceFor(display: number): Promise<string> {
   const sources = await desktopCapturer.getSources({ types: ["screen"], thumbnailSize: { width: 0, height: 0 } });
@@ -201,8 +221,8 @@ async function hostRequest(peerId: string, method: string, params: Record<string
   if (method === "frame") {
     if (FAKE_SCREEN) return shrink(fakePicture(), params.width);
     if (!status.SUPPORTED) throw new Error("unsupported");
-    const jpeg = await screens.capture(Number(params.display));
     const tile = typeof params.width === "number" && params.width <= TILE_MAX_WIDTH;
+    const jpeg = tile ? await tilePicture(Number(params.display)) : await screens.capture(Number(params.display));
     if (!tile && status.remoteFrameSent(peer.name)) note(peer.name, "view", by);
     return shrink(jpeg, params.width);
   }

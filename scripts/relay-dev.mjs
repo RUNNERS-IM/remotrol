@@ -42,8 +42,26 @@ function readJson(req) {
 
 const tokensFor = (email) => ({ accessToken: `dev.${email}`, refreshToken: `devrefresh.${email}` });
 
+// The account profile (system-server PR #113): the nickname each account chose, kept while this server runs.
+const nicknames = new Map();
+const profileOf = (email) => ({ email, nickname: nicknames.get(email) || email.split("@")[0], custom: nicknames.has(email) });
+
+async function profile(req, res) {
+  const token = (req.headers.authorization ?? "").replace(/^Bearer /, "");
+  const email = token.startsWith("dev.") ? token.slice(4) : null;
+  if (!email) return json(res, 401, { message: "unauthorized" });
+  if (req.method === "GET") return json(res, 200, profileOf(email));
+  if (req.method !== "PATCH") return json(res, 404, { message: "not found" });
+  const nickname = String((await readJson(req)).nickname ?? "").trim().replace(/\s+/g, " ");
+  if (nickname.length > 30) return json(res, 400, { message: "format" });
+  if (nickname) nicknames.set(email, nickname);
+  else nicknames.delete(email);
+  return json(res, 200, profileOf(email));
+}
+
 const http = createServer(async (req, res) => {
   const path = new URL(req.url ?? "/", "http://dev").pathname;
+  if (path === "/api/mobile/account/profile") return profile(req, res);
   if (req.method !== "POST") return json(res, 404, { message: "not found" });
   const body = await readJson(req);
   if (path === "/api/mobile/auth/login" || path === "/api/mobile/auth/signup") {
