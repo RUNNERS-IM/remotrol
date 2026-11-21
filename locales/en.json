@@ -10,7 +10,7 @@
   "menu.open": "Open Remotrol",
   "menu.disconnect": "Disconnect Now",
   "menu.allowViewing": "Let Other Computers See This",
-  "menu.openAtLogin": "Open at Login",
+  "menu.openAtLogin": "Open at login",
   "menu.autoUpdate": "Install updates automatically",
   "menu.checkUpdates": "Check for Updates…",
   "menu.help": "Help & Feedback",
@@ -136,7 +136,7 @@
   "general.section": "Behavior",
   "general.openAtLoginHint": "Remotrol starts by itself when you log in to this computer.",
   "general.autoUpdateHint": "Downloads new versions and installs them while you're away or when you quit the app. When off, asks before installing.",
-  "general.trayIcon": "Show in Menu Bar",
+  "general.trayIcon": "Show in menu bar",
   "general.trayIconHint": "When off, open Remotrol from the Applications folder to get back to these settings.",
   "general.hideAsk": "Hide Remotrol from the menu bar?",
   "general.ok": "OK",
@@ -180,5 +180,6 @@
   "account.nicknameHint": "Shown beside the panda and in the other RUNNERS apps. Leave it empty to use the part of your email before @.",
   "account.nicknameLong": "A nickname can be up to 30 characters.",
   "account.save": "Save",
-  "account.saved": "Saved"
+  "account.saved": "Saved",
+  "thisMac.allow": "Let other computers see this"
 }

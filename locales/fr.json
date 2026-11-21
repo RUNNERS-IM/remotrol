@@ -180,5 +180,6 @@
   "account.nicknameHint": "Affiché à côté du panda et dans les autres apps RUNNERS. Laissez vide pour utiliser la partie de l’e-mail avant @.",
   "account.nicknameLong": "Un pseudo peut contenir 30 caractères au maximum.",
   "account.save": "Enregistrer",
-  "account.saved": "Enregistré"
+  "account.saved": "Enregistré",
+  "thisMac.allow": "Montrer cet écran aux autres ordinateurs"
 }

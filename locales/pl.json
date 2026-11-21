@@ -186,5 +186,6 @@
   "account.nicknameHint": "Widoczny obok pandy i w innych aplikacjach RUNNERS. Zostaw puste, aby użyć części adresu e-mail przed @.",
   "account.nicknameLong": "Pseudonim może mieć najwyżej 30 znaków.",
   "account.save": "Zapisz",
-  "account.saved": "Zapisano"
+  "account.saved": "Zapisano",
+  "thisMac.allow": "Pokazuj ten ekran innym komputerom"
 }

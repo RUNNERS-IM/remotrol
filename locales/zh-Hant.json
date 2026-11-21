@@ -178,5 +178,6 @@
   "account.nicknameHint": "顯示在熊貓旁邊和其他 RUNNERS App 中的名字。留空則使用電子郵件 @ 前面的部分。",
   "account.nicknameLong": "暱稱最多 30 個字元。",
   "account.save": "儲存",
-  "account.saved": "已儲存"
+  "account.saved": "已儲存",
+  "thisMac.allow": "允許其他電腦檢視此螢幕"
 }

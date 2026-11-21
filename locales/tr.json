@@ -180,5 +180,6 @@
   "account.nicknameHint": "Pandanın yanında ve diğer RUNNERS uygulamalarında görünür. E-postanın @ öncesini kullanmak için boş bırakın.",
   "account.nicknameLong": "Takma ad en fazla 30 karakter olabilir.",
   "account.save": "Kaydet",
-  "account.saved": "Kaydedildi"
+  "account.saved": "Kaydedildi",
+  "thisMac.allow": "Bu ekranı diğer bilgisayarlara göster"
 }

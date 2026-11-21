@@ -178,5 +178,6 @@
   "account.nicknameHint": "판다 옆과 다른 RUNNERS 앱에 보이는 이름입니다. 비우면 이메일 @ 앞부분을 씁니다.",
   "account.nicknameLong": "닉네임은 30자까지 쓸 수 있습니다.",
   "account.save": "저장",
-  "account.saved": "저장됨"
+  "account.saved": "저장됨",
+  "thisMac.allow": "다른 컴퓨터에 이 화면 보이기"
 }

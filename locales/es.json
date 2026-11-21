@@ -180,5 +180,6 @@
   "account.nicknameHint": "Se muestra junto al panda y en las demás apps de RUNNERS. Déjalo vacío para usar la parte del correo antes de @.",
   "account.nicknameLong": "El apodo puede tener hasta 30 caracteres.",
   "account.save": "Guardar",
-  "account.saved": "Guardado"
+  "account.saved": "Guardado",
+  "thisMac.allow": "Mostrar esta pantalla a otros ordenadores"
 }
