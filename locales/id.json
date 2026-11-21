@@ -178,5 +178,6 @@
   "account.nicknameHint": "Tampil di samping panda dan di aplikasi RUNNERS lain. Kosongkan untuk memakai bagian email sebelum @.",
   "account.nicknameLong": "Nama panggilan paling banyak 30 karakter.",
   "account.save": "Simpan",
-  "account.saved": "Tersimpan"
+  "account.saved": "Tersimpan",
+  "thisMac.allow": "Tampilkan layar ini ke komputer lain"
 }

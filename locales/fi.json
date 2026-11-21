@@ -180,5 +180,6 @@
   "account.nicknameHint": "Näkyy pandan vieressä ja muissa RUNNERS-apeissa. Jätä tyhjäksi, niin käytetään sähköpostin @-merkkiä edeltävää osaa.",
   "account.nicknameLong": "Lempinimessä voi olla enintään 30 merkkiä.",
   "account.save": "Tallenna",
-  "account.saved": "Tallennettu"
+  "account.saved": "Tallennettu",
+  "thisMac.allow": "Näytä tämä näyttö muille tietokoneille"
 }

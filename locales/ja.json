@@ -178,5 +178,6 @@
   "account.nicknameHint": "パンダの横とほかの RUNNERS アプリに表示される名前です。空にするとメールの @ より前を使います。",
   "account.nicknameLong": "ニックネームは30文字までです。",
   "account.save": "保存",
-  "account.saved": "保存しました"
+  "account.saved": "保存しました",
+  "thisMac.allow": "ほかのコンピュータにこの画面を見せる"
 }

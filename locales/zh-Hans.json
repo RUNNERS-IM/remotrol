@@ -178,5 +178,6 @@
   "account.nicknameHint": "显示在熊猫旁边和其他 RUNNERS 应用中的名字。留空则使用邮箱 @ 前面的部分。",
   "account.nicknameLong": "昵称最多 30 个字符。",
   "account.save": "保存",
-  "account.saved": "已保存"
+  "account.saved": "已保存",
+  "thisMac.allow": "允许其他电脑查看此屏幕"
 }

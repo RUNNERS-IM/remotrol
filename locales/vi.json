@@ -178,5 +178,6 @@
   "account.nicknameHint": "Hiện cạnh gấu trúc và trong các ứng dụng RUNNERS khác. Để trống để dùng phần email trước @.",
   "account.nicknameLong": "Biệt danh tối đa 30 ký tự.",
   "account.save": "Lưu",
-  "account.saved": "Đã lưu"
+  "account.saved": "Đã lưu",
+  "thisMac.allow": "Cho máy tính khác xem màn hình này"
 }

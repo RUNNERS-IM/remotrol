@@ -125,9 +125,9 @@ function ThisMac({ status, link, onLink }: { status: Status; link: Link; onLink:
       <section className="s-section">
         <div className="s-card">
           {/* Why: Windows and Linux cannot share their screen yet, so the switch reads off there and cannot be pressed. */}
-          <Row title={t("menu.allowViewing")} hint={t(status.supported ? "thisMac.allowHint" : "thisMac.allowHintUnsupported")}>
+          <Row title={t("thisMac.allow")} hint={t(status.supported ? "thisMac.allowHint" : "thisMac.allowHintUnsupported")}>
             <Switch
-              label={t("menu.allowViewing")}
+              label={t("thisMac.allow")}
               on={status.supported && link.allowViewing}
               disabled={!status.supported}
               onChange={() => void native.setAllow("allowViewing", !link.allowViewing).then(onLink)}
