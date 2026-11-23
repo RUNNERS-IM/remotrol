@@ -322,6 +322,12 @@ class Incoming {
       for (const track of tracks) track.stop();
       throw error;
     }
+    // Why: the viewer can leave while the screen is still being opened; close() has already run, so tracks opened
+    // after it would keep the screen recorded with nobody watching.
+    if (this.closed) {
+      for (const track of tracks) track.stop();
+      throw new Error("closed");
+    }
     this.stopVideo();
     this.videos = tracks;
     for (const [line, track] of tracks.entries()) {
