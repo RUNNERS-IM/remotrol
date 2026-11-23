@@ -4,8 +4,8 @@
 <h1 align="center">Remotrol</h1>
 <p align="center"><b>The computer next door, right from your desk.</b><br>See the other computers on your RUNNERS account, one monitor at a time, and click and type on them.</p>
 <p align="center">
-  <a href="https://runners.im/remote"><b>Download for Mac</b></a> ·
-  <a href="https://runners.im/remote">runners.im/remote</a> ·
+  <a href="https://runners.im/en/remote"><b>Download for Mac</b></a> ·
+  <a href="https://runners.im/en/remote">runners.im/en/remote</a> ·
   <a href="README.ko.md">한국어</a>
 </p>
 <p align="center"><sub>Free · macOS 14 or later · Apple silicon · Intel · iPhone app coming · 20 languages</sub></p>
