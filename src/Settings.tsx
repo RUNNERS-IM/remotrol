@@ -112,7 +112,7 @@ function ThisMac({ status, link, onLink }: { status: Status; link: Link; onLink:
         <div className="s-status-text">
           <div className="s-status-name">{status.computer}</div>
           <div className="s-status-line">
-            <span className={`s-status-dot${status.viewers.length > 0 ? " on" : ""}`} />
+            <span className={`s-status-dot ${status.state}`} aria-hidden />
             {status.viewers.length > 0 ? t("status.viewers", { names: status.viewers.join(", ") }) : statusText(status.state, status.reason)}
           </div>
         </div>
