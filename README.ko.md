@@ -4,8 +4,8 @@
 <h1 align="center">Remotrol</h1>
 <p align="center"><b>옆자리 컴퓨터를 내 자리에서.</b><br>같은 RUNNERS 계정의 다른 컴퓨터 화면을 모니터별로 보고, 클릭하고 글자를 칩니다.</p>
 <p align="center">
-  <a href="https://runners.im/remote"><b>Mac 용 받기</b></a> ·
-  <a href="https://runners.im/remote">runners.im/remote</a> ·
+  <a href="https://runners.im/remotrol"><b>Mac 용 받기</b></a> ·
+  <a href="https://runners.im/remotrol">runners.im/remotrol</a> ·
   <a href="README.md">English</a>
 </p>
 <p align="center"><sub>무료 · macOS 14 이상 · Apple silicon · Intel · iPhone 앱 준비 중 · 20개 언어</sub></p>
