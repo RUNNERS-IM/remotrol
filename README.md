@@ -11,8 +11,8 @@
 <p align="center"><sub>Free · macOS 14 or later · Apple silicon · Intel · iPhone app coming · 20 languages</sub></p>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/all-computers-en-dark.webp">
-  <img src="docs/images/all-computers-en-light.webp" alt="The Remotrol window before signing in">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-en-dark.webp">
+  <img src="docs/images/view-en-light.webp" alt="Watching another computer's screen in Remotrol, with the displays menu open">
 </picture>
 
 ## What it does

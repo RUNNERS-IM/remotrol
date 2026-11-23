@@ -11,8 +11,8 @@
 <p align="center"><sub>무료 · macOS 14 이상 · Apple silicon · Intel · iPhone 앱 준비 중 · 20개 언어</sub></p>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/all-computers-ko-dark.webp">
-  <img src="docs/images/all-computers-ko-light.webp" alt="로그인하기 전 Remotrol 창">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-ko-dark.webp">
+  <img src="docs/images/view-ko-light.webp" alt="Remotrol 에서 다른 컴퓨터 화면을 보는 중, 모니터 메뉴를 연 모습">
 </picture>
 
 ## 하는 일
