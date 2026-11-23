@@ -1,38 +1,44 @@
-# Remotrol
+<p align="center">
+  <img src="https://runners.im/images/apps/remote/icon.webp" width="96" alt="Remotrol">
+</p>
+<h1 align="center">Remotrol</h1>
+<p align="center"><b>The computer next door, right from your desk.</b><br>See the other computers on your RUNNERS account, one monitor at a time, and click and type on them.</p>
+<p align="center">
+  <a href="https://runners.im/en/remotrol"><b>Download for Mac</b></a> ·
+  <a href="https://runners.im/en/remotrol">runners.im/en/remotrol</a> ·
+  <a href="README.ko.md">한국어</a>
+</p>
+<p align="center"><sub>Free · macOS 14 or later · Apple silicon · Intel · iPhone app coming · 20 languages</sub></p>
 
-**English** · [한국어](README.ko.md)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/view-en-dark.webp">
+  <img src="docs/images/view-en-light.webp" alt="Watching another computer's screen in Remotrol, with the displays menu open">
+</picture>
 
-See the screens of the other computers in your office, one monitor at a time, and click or type on them remotely. Claude sessions can use the same remote screens through MCP tools.
+## What it does
 
-Remotrol is made by RUNNERS-IM for the computers in our office. It is written with [Electron](https://www.electronjs.org) and one Rust native module, like Monitor.
+<table>
+<tr>
+<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/menu-en-dark.webp"><img src="docs/images/menu-en-light.webp" alt=""></picture><br><b>Lives in the menu bar</b><br>The icon shows whether this Mac is off, waiting or being viewed. Its panel lists your other computers; pick one to see its screens.</td>
+<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/log-en-dark.webp"><img src="docs/images/log-en-light.webp" alt=""></picture><br><b>See who looked</b><br>Who viewed, clicked or typed on this Mac, from a computer, a phone or Claude, kept for 7 days. What was typed is never recorded.</td>
+</tr>
+<tr>
+<td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/claude-en-dark.webp"><img src="docs/images/claude-en-light.webp" alt=""></picture><br><b>Claude can use the same screens</b><br>Six MCP tools let Claude list the computers, see them, and click and type once a person approves.</td>
+<td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/general-en-dark.webp"><img src="docs/images/general-en-light.webp" alt=""></picture><br><b>Updates itself quietly</b><br>New versions install while nobody is using the Mac or when you quit, and wait while someone is watching.</td>
+</tr>
+</table>
 
-**Remotrol is in early development.** The first release is 2.6.1102 ([Releases](https://github.com/RUNNERS-IM/remotrol/releases)). Computers connect when they are signed in to the same RUNNERS account; the system server that signs in and relays is not up yet, so for now this works only against `scripts/relay-dev.mjs` (see Building from source).
+Computers signed in to the same RUNNERS account find each other; there is no network to set up. Screens, clicks and keys go directly between the two devices, encrypted, and never through the server.
 
-## What works now
+## Install
 
-- Remotrol sits in the menu bar without a Dock icon. The menu-bar picture shows the state: a frame only when **Remote Off**, an arrow when **Waiting**, and a moving arrow while **Being Viewed**. When Remotrol is off, the status line says why (**macOS Only** or **Screen Recording Needed**).
-- Clicking or right-clicking the menu-bar icon opens the same panel: the other computers (pressing one opens its screens), Open All Computers, whether this Mac can be seen, Disconnect while someone is looking, then Settings… ⌘, · Help & Feedback · Quit. On Linux, whose trays only open a menu, the same lines are a native menu.
-- The Remotrol window shows this Mac's displays as tabs and a live picture of the chosen display, about five pictures a second. Pictures are taken with ScreenCaptureKit and sent to the window as JPEG; other computers' screens come as video (below).
-- Remotrol needs two macOS permissions:
-  - **Screen Recording**, to take pictures of the screen
-  - **Accessibility**, to send clicks and keystrokes
-- Clicks are posted with CGEvent, at positions mapped to the chosen display. There is no switch on the viewing side: once the other computer allows clicks, clicking the picture clicks there.
-- **Other computers** (stages 2 and 3): sign in to a RUNNERS account in the Remotrol window. Remotrol keeps one connection to the system server's relay (`electron/main/relay.ts`), which lists the computers and phones of the same account that are online and carries the messages that set up a WebRTC connection between two of them (`src/peer.ts`). The screen goes over that connection as video (up to 15 pictures a second), and info, still pictures and clicks over its data channel; nothing of the screen passes through the server. Every computer of the account that has Remotrol running gets a tile in the Remotrol window; choosing one shows its monitors and screen, and clicking the picture clicks there and keys typed after clicking go there (a text box sends Korean and other composed text). Remotrol answers only devices the relay lists for the same account, and the names in the connection log are the ones the relay lists.
-- **Account**: signed out, the window shows a sign-in form (email and password, or making an account); **Settings › Account** shows the account with a **Sign Out** button. The password is sent as its SHA-256, and the tokens are kept encrypted by the OS (`electron/main/account.ts`).
-- On the computer being looked at: **Let Other Computers See This** (on by default) in the panel and the menu, which covers seeing, clicking and typing together (clicks and keys also need the Accessibility permission on that computer), the yellow **Being Viewed** state with who is looking (in the Remotrol window, the This Computer line at the bottom names them next to **Disconnect Now**; a computer that only gets the small picture for its All Computers tile does not count as viewing), **Disconnect Now**, which turns seeing off at once, and a connection log in Settings (who started viewing, clicked, pressed keys or typed, and whether it was a computer, a phone or Claude; kept for 7 days, never what was typed).
-- Account: the nickname shows beside the panda at the top right of the window. It starts as the part of the email before @; changed in Settings › Account it is kept on the account server, so every RUNNERS app shows the same name (up to 30 characters; empty goes back to the email's first part).
-- All Computers: computers of the account seen in the last 30 days stay as grey tiles while they are off, with when they were last on. In Settings each permission shows a green or red dot with On or Off, and **Open System Settings** when it is off.
-- **Claude** (stage 4): `resources/mcp/remote-mcp.mjs` is an MCP server with six tools: `remote_computers`, `remote_displays`, `remote_screenshot`, `remote_click`, `remote_type`, `remote_key`. Looking needs no approval (the other computer's switch decides). Clicking and typing follow the allow list: in an app on it Claude acts at once; in any other app a person at the computer Claude runs on approves first and can add the app to the list; in a macOS security window (password prompts, System Settings) a person approves every time. Claude cannot click a computer that has **Let Other Computers See This** off or has not been given Accessibility, and nobody is asked in that case. So that a Claude session on a Mac with nobody at it does not wait at a question, Claude is refused without asking when nobody has used the computer Claude runs on for 2 minutes, and when a question gets no answer within a minute. The **Claude** tab in Settings shows whether Claude Code is connected, the allow list (with Remove) and what Claude did.
-- Remotrol checks for updates once a day (see [PRIVACY.md](PRIVACY.md)), downloads a new version and installs it by itself after 10 minutes with nobody using the computer or when Remotrol quits, then says so once at the next launch. It waits while another computer or phone is watching this screen. Turning off **Install updates automatically** in Settings › General makes it ask before installing. Remotrol opens at login unless that line is turned off.
-- Screen text in 20 languages: Arabic, Chinese (Simplified), Chinese (Traditional), Dutch, English, Finnish, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Thai, Turkish and Vietnamese.
+```sh
+brew install --cask runners-im/tap/remote
+```
 
-## Roadmap
+Or download the latest `remote-macos-arm64.dmg` (Apple silicon) or `remote-macos-x64.dmg` (Intel) from [Releases](https://github.com/RUNNERS-IM/remotrol/releases/latest).
 
-1. Receiving side on macOS: capture each monitor and accept clicks and key presses (done)
-2. Viewing side: a list of computers, a tab per monitor, view, click and type (done)
-3. Connection: a RUNNERS account and the system server's relay, WebRTC video and data channel, a connection log, the "being viewed" sign and a one-click disconnect (two copies on one Mac against `scripts/relay-dev.mjs` tested on 2026-11-03 with a drawn test screen; the real server and two Macs not tested yet)
-4. MCP tools for Claude sessions with approval (done)
-5. Windows and Linux receiving side, phone apps for the viewing side (not started; Windows and Linux builds can view other computers but cannot be viewed)
+Remotrol asks for two macOS permissions: **Screen Recording**, so other computers can see this one, and **Accessibility**, so they can click and type on it. **Let Other Computers See This** turns both off at once.
 
 ## Using Remotrol with Claude
 
@@ -41,60 +47,11 @@ claude mcp add --scope user remote -- env ELECTRON_RUN_AS_NODE=1 /Applications/R
   /Applications/Remotrol.app/Contents/Resources/mcp/remote-mcp.mjs
 ```
 
-On the eight office Macs claude-config adds this to every Claude session. On another Mac, copy the command from the
-**Claude** tab in Settings and paste it in Terminal. Remotrol must be running. The script talks to it over a socket only your user can open (`claude.sock` in the Remote
-folder under Application Support, which keeps its name from before the rename).
-
-## Building from source
-
-Requires macOS 14 or later, [Rust](https://rustup.rs), Node.js 20 or later and pnpm.
-
-```sh
-pnpm install
-pnpm native         # build the native module (native/) for this computer
-pnpm dev            # run with live reload
-pnpm dist           # build the app for this OS into dist.noindex/
-pnpm check:locales  # check every locale against ko.json
-```
-
-For an Intel Mac build on Apple silicon, also run `pnpm native --target x86_64-apple-darwin` (after `rustup target add x86_64-apple-darwin`).
-
-- `electron/main/` is the main process (tray, panel, viewer and Settings windows, status, updates), `electron/preload/` the bridge the page talks through, `src/` the panel, viewer and Settings pages.
-- `native/` is the one native module (napi-rs): display capture, posted clicks, the app in front, permission checks and the tray picture.
-- `electron/main/account.ts` signs in and keeps the tokens, `electron/main/relay.ts` keeps the relay connection, and `src/peer.ts` (in the Remotrol window, made hidden at launch) holds the WebRTC connections. `electron/main/link.ts` answers other devices and asks them for Claude; `electron/main/claude.ts` serves the MCP script.
-- Screen text lives in `locales/`, with `ko.json` as the source; the page and the main process read the same files.
-- Debug runs take `REMOTE_OPEN=panel|viewer|settings[:tab]` `REMOTE_THEME=dark|light`. A packaged app ignores them.
-- `RUNNERS_TEST_SHOTS=<folder>` (debug runs) opens every window by itself, saves a picture of each in Korean and English, light and dark, writes `shots.json` and quits. `RUNNERS_TEST_ACCOUNT=signed-in` with `REMOTE_API_URL` pointing at `scripts/relay-dev.mjs` adds the signed-in screens. The shared rule is in the RUNNERS app kit (`desktop/README.md`, test shots).
-- To try two computers on one Mac without the server: `node scripts/relay-dev.mjs` (a stand-in relay and login on 127.0.0.1:8790 that takes any email), then start each copy with `REMOTE_API_URL=http://127.0.0.1:8790`, its own `--user-data-dir`, and `REMOTE_FAKE_SCREEN=1` to send a drawn test screen instead of the real one.
-
-When run with `pnpm dev`, macOS asks for permissions on behalf of the terminal app that started Remotrol, not Remotrol itself.
-
-So far Remotrol has been built and checked on macOS (Apple silicon) only. On Windows and Linux it only says that Remotrol works on macOS for now.
-
-## Releasing
-
-Merging into the `release` branch builds and publishes a release (`.github/workflows/release.yml`). Before that, write
-this release's changes in `RELEASE_NOTES.md`. It becomes the GitHub release text, and the update window shows its list
-under "What's new":
-
-```md
-## 한국어
-
-- 한 줄에 바뀐 점 하나씩, 합니다체로 씁니다.
-
-## English
-
-- One change per line.
-```
-
-Korean screens read the `## 한국어` list, every other language the `## English` one. The version bump
-(`scripts/bump-release.sh`) stops when either list is empty or the file is the same as the last release's.
+Or copy the command from the **Claude** tab in Settings and paste it in Terminal. Remotrol must be running.
 
 ## Uninstall
 
-1. Choose **Quit Remotrol** from the menu bar.
-2. Move Remotrol from Applications to the Trash.
-3. Remove the permissions in System Settings → Privacy & Security → Screen & System Audio Recording and Accessibility, or run:
+Quit Remotrol from the menu bar, move it from Applications to the Trash, and remove its permissions in System Settings › Privacy & Security, or run:
 
 ```sh
 tccutil reset ScreenCapture im.runners.remote
@@ -103,8 +60,12 @@ tccutil reset Accessibility im.runners.remote
 
 ## Privacy
 
-Remotrol has no ads or analytics. When it hits an error, it sends a crash report (the kind of error, the lines of code, the app and OS versions) to Runners' error tracker (Sentry), with emails, tokens and the computer's names removed first. Screens travel directly between devices of the same account and never through Runners. See [PRIVACY.md](PRIVACY.md).
+Remotrol has no ads or analytics. When it hits an error, it sends a crash report to Runners' error tracker (Sentry) with emails, tokens and computer names removed first. See [PRIVACY.md](PRIVACY.md).
 
-## License
+## Development
 
-Copyright (c) 2026 Runners Co., Ltd. All rights reserved. The source is published for reading only; see [LICENSE.md](LICENSE.md).
+See [docs/development.md](docs/development.md).
+
+---
+
+<p align="center"><a href="https://runners.im"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/icons/logos/RUNNERS_H_W.svg"><img src="https://runners.im/icons/logos/RUNNERS_H.svg" height="20" alt="RUNNERS"></picture></a><br><sub>Made by RUNNERS · Source published for reading only, see <a href="LICENSE.md">LICENSE.md</a></sub></p>
