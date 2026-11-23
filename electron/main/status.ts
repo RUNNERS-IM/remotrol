@@ -56,7 +56,8 @@ export function permissions(): Permissions {
 let computer: string | null = null;
 
 export function current(): Status {
-  computer ??= native.computerName();
+  // Debug runs only: REMOTE_FAKE_NAME gives a made-up computer name for store and site pictures.
+  computer ??= (!app.isPackaged && process.env.REMOTE_FAKE_NAME?.trim()) || native.computerName();
   const allowed = permissions();
   let state: State = "waiting";
   let reason: OffReason | null = null;

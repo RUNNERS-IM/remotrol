@@ -39,15 +39,22 @@ const MIN_WIDTH = 160;
 const MAX_WIDTH = 1280;
 /** Debug runs only: REMOTE_FAKE_SCREEN=1 sends a drawn test picture instead of the screen, so two copies on one Mac can
  *  be tried without the Screen Recording permission and without anyone's screen leaving the window. */
-const FAKE_SCREEN = DEV && process.env.REMOTE_FAKE_SCREEN === "1";
+/** REMOTE_FAKE_SCREEN=<path to a PNG or JPEG> sends that picture instead of the drawn one, for store and site pictures
+ *  that need a tidy made-up desktop. */
+const FAKE_PICTURE = DEV && process.env.REMOTE_FAKE_SCREEN && process.env.REMOTE_FAKE_SCREEN !== "1" ? process.env.REMOTE_FAKE_SCREEN : null;
+const FAKE_SCREEN = DEV && (process.env.REMOTE_FAKE_SCREEN === "1" || FAKE_PICTURE !== null);
 /** With REMOTE_FAKE_SCREEN, REMOTE_FAKE_DISPLAYS=3 says this computer has that many displays, to try side by side
  *  viewing on a Mac with one. */
 const FAKE_DISPLAYS = FAKE_SCREEN ? Math.min(4, Number(process.env.REMOTE_FAKE_DISPLAYS) || 0) : 0;
 
 function fakeDisplays(): Display[] {
   return Array.from({ length: FAKE_DISPLAYS }, (_, i) => {
-    const [width, height] = i === 1 ? [1496, 967] : [2560, 1440];
-    return { id: i + 1, name: `Test ${i + 1}`, main: i === 0, x: i * 2560, y: 0, width, height, pixelWidth: width * 2, pixelHeight: height * 2 };
+    // Why the picture's own size: another size would show the picture with black bars.
+    const picture = FAKE_PICTURE ? nativeImage.createFromPath(FAKE_PICTURE).getSize() : null;
+    const [width, height] = picture ? [picture.width / 2, picture.height / 2] : i === 1 ? [1496, 967] : [2560, 1440];
+    // Why ordinary names with a picture: those runs make store and site pictures, where "Test 1" would show.
+    const name = FAKE_PICTURE ? (["Studio Display", "Built-in Retina Display"][i] ?? `Display ${i + 1}`) : `Test ${i + 1}`;
+    return { id: i + 1, name, main: i === 0, x: i * 2560, y: 0, width, height, pixelWidth: width * 2, pixelHeight: height * 2 };
   });
 }
 /** Debug runs only: `REMOTE_FAKE_INPUT=1` prints each input from another computer instead of posting it, and keeps
@@ -148,7 +155,10 @@ function shrink(jpeg: Buffer, asked: unknown): Buffer {
 
 /** The debug test picture: a colour that changes every second, so a still picture visibly moves, under speckles that
  *  make the JPEG large enough (over 100 KB) to be sent in parts like a real screen. */
+let fakeJpeg: Buffer | null = null;
+
 function fakePicture(): Buffer {
+  if (FAKE_PICTURE) return (fakeJpeg ??= nativeImage.createFromPath(FAKE_PICTURE).toJPEG(90));
   const width = 1280;
   const height = 800;
   const pixels = Buffer.alloc(width * height * 4);
@@ -227,7 +237,7 @@ async function hostRequest(peerId: string, method: string, params: Record<string
     return shrink(jpeg, params.width);
   }
   if (method === "watch") {
-    if (FAKE_SCREEN) return { fake: true };
+    if (FAKE_SCREEN) return FAKE_PICTURE ? { fake: true, picture: `data:image/jpeg;base64,${fakePicture().toString("base64")}` } : { fake: true };
     if (!status.SUPPORTED) throw new Error("unsupported");
     if (!now.permissions.screenRecording) throw new Error("permission");
     if (status.remoteFrameSent(peer.name)) note(peer.name, "view", by);

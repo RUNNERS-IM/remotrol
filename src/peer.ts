@@ -315,8 +315,8 @@ class Incoming {
     const tracks: MediaStreamTrack[] = [];
     try {
       for (const display of displays.slice(0, senders.length)) {
-        const answer = (await api().hostRequest(this.device, "watch", { display })) as { sourceId?: string; fake?: boolean };
-        tracks.push(answer.fake ? fakeTrack(display) : await screenTrack(String(answer.sourceId), maxWidth));
+        const answer = (await api().hostRequest(this.device, "watch", { display })) as { sourceId?: string; fake?: boolean; picture?: string };
+        tracks.push(answer.fake ? await fakeTrack(display, answer.picture) : await screenTrack(String(answer.sourceId), maxWidth));
       }
     } catch (error) {
       for (const track of tracks) track.stop();
@@ -387,14 +387,25 @@ async function screenTrack(sourceId: string, maxWidth?: number): Promise<MediaSt
 }
 
 /** Debug runs with REMOTE_FAKE_SCREEN=1: a drawn picture with a moving bar, the display and the time, instead of the
- *  screen. */
-function fakeTrack(display: number): MediaStreamTrack {
+ *  screen. With a picture (REMOTE_FAKE_SCREEN=<path>), that picture at its own size, kept still. */
+async function fakeTrack(display: number, picture?: string): Promise<MediaStreamTrack> {
   const canvas = document.createElement("canvas");
   canvas.width = 1280;
   canvas.height = 800;
   const draw = canvas.getContext("2d");
+  const image = picture ? new Image() : null;
+  if (image && picture) {
+    image.src = picture;
+    await image.decode();
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+  }
   const paint = () => {
     if (!draw) return;
+    if (image) {
+      draw.drawImage(image, 0, 0);
+      return;
+    }
     const now = Date.now();
     draw.fillStyle = "#24476b";
     draw.fillRect(0, 0, canvas.width, canvas.height);
