@@ -6,6 +6,7 @@ import type { SettingsTab } from "../preload/api";
 import { API_URL } from "./account";
 import { currentLocale, setLocale } from "./i18n";
 import * as link from "./link";
+import * as status from "./status";
 import { keepHidden, prepareTestShots, readTestShots, runTestShots, type TestShotPass } from "./runners/test-shots";
 import { askUpdate, reloadPage, setPageLang } from "./windows";
 
@@ -27,6 +28,14 @@ export type ShotApp = {
 };
 
 const config = app.isPackaged ? null : readTestShots();
+
+/** Debug runs only: `REMOTE_SHOT_ACCOUNT=<email>` signs in to that relay-dev account in every pass instead of one per
+ *  theme, so made-up computers started beside the run (REMOTE_FAKE_NAME · REMOTE_FAKE_SCREEN=<picture>, signed in to the
+ *  same account) are on the list. Then the run also opens `REMOTE_SHOT_OPEN=<computer name>` and takes the site
+ *  pictures: the list while another computer looks at this one, the menu bar window saying so, the computer's screen
+ *  with its display and shortcut menus, and the Claude tab. */
+const SHOT_ACCOUNT = process.env.REMOTE_SHOT_ACCOUNT?.trim() || null;
+const SHOT_OPEN = process.env.REMOTE_SHOT_OPEN?.trim() || null;
 
 /** Whether this run only takes the test shots. */
 export const TEST_SHOTS = config !== null;
@@ -134,10 +143,11 @@ async function scenes(pass: TestShotPass, shotApp: ShotApp): Promise<void> {
     pass.note("로그인 뒤 화면은 건너뜀: REMOTE_API_URL 이 이 맥의 relay-dev 가 아님");
     return;
   }
+  const email = SHOT_ACCOUNT ?? `test-shots-${pass.theme}@runners.im`;
   try {
-    await link.signIn("signup", `test-shots-${pass.theme}@runners.im`, "test1234");
+    await link.signIn("signup", email, "test1234");
   } catch {
-    await link.signIn("login", `test-shots-${pass.theme}@runners.im`, "test1234");
+    await link.signIn("login", email, "test1234");
   }
   await pass.wait(3000);
   await pass.shot(viewer, "main", "모든-컴퓨터-로그인");
@@ -150,7 +160,67 @@ async function scenes(pass: TestShotPass, shotApp: ShotApp): Promise<void> {
   const settings = pageWindow("settings");
   if (settings) await pass.shot(settings, "settings", "계정-로그인");
   settings?.destroy();
+  if (SHOT_ACCOUNT) await peerScenes(pass, shotApp, viewer);
   await link.signOut();
+  await pass.wait(1000);
+}
+
+/** Waits up to `ms` for `check`, looking every half second. */
+async function until(pass: TestShotPass, check: () => boolean | Promise<boolean>, ms: number): Promise<boolean> {
+  for (let waited = 0; waited < ms; waited += 500) {
+    if (await check()) return true;
+    await pass.wait(500);
+  }
+  return false;
+}
+
+/** The site pictures (see REMOTE_SHOT_ACCOUNT), signed in with the made-up computers online. */
+async function peerScenes(pass: TestShotPass, shotApp: ShotApp, viewer: BrowserWindow): Promise<void> {
+  const tiles = () => viewer.webContents.executeJavaScript(`[...document.querySelectorAll(".tile img")].filter((i) => i.complete && i.naturalWidth > 0).length`) as Promise<number>;
+  if (!(await until(pass, async () => (await tiles()) > 0, 20000))) pass.note("다른 컴퓨터의 작은 화면이 20초 안에 안 보임");
+  if (!(await until(pass, () => status.current().viewers.length > 0, 20000))) pass.note("이 컴퓨터를 보는 컴퓨터가 20초 안에 없음");
+  await pass.wait(2500);
+  await pass.shot(viewer, "main", "모든-컴퓨터-보는-중");
+  const panel = shotApp.panel();
+  if (panel) {
+    shotApp.showPanel();
+    await pass.wait(800);
+    await pass.shot(panel, "menu", "메뉴-막대-창-보는-중");
+    panel.hide();
+  }
+  shotApp.openSettings("claude");
+  await pass.wait(1500);
+  const settings = pageWindow("settings");
+  if (settings) {
+    await loaded(settings);
+    await pass.wait(400);
+    await pass.shot(settings, "settings", "Claude-로그인");
+    settings.destroy();
+  }
+  if (!SHOT_OPEN) return;
+  const opened = await viewer.webContents.executeJavaScript(
+    `(() => { const tile = [...document.querySelectorAll(".tile")].find((t) => t.querySelector(".tile-name")?.textContent === ${JSON.stringify(SHOT_OPEN)}); tile?.click(); return Boolean(tile); })()`,
+  );
+  if (!opened) {
+    pass.note(`목록에 ${SHOT_OPEN} 없음`);
+    return;
+  }
+  const playing = () => viewer.webContents.executeJavaScript(`[...document.querySelectorAll("video")].some((v) => v.videoWidth > 0 && !v.paused)`) as Promise<boolean>;
+  if (!(await until(pass, playing, 20000))) pass.note(`${SHOT_OPEN} 화면이 20초 안에 안 나옴`);
+  await pass.wait(2000);
+  await pass.shot(viewer, "main", "화면-보기");
+  const menus = [
+    ["화면-보기-모니터-메뉴", `document.querySelectorAll(".bar-menu-box")[0]?.querySelector(".bar-button")?.click(), 1`],
+    ["화면-보기-단축키-메뉴", `document.querySelectorAll(".bar-menu-box")[1]?.querySelector(".bar-button")?.click(), 1`],
+  ] as const;
+  for (const [screen, open] of menus) {
+    await viewer.webContents.executeJavaScript(open);
+    await pass.wait(800);
+    await pass.shot(viewer, "main", screen);
+    await viewer.webContents.executeJavaScript(`document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })), 1`);
+    await pass.wait(400);
+  }
+  await viewer.webContents.executeJavaScript(`document.querySelector(".window-bar .bar-button, .bar-button")?.click(), 1`);
   await pass.wait(1000);
 }
 

@@ -99,6 +99,8 @@ function addCommand(): string {
 
 /** Whether Claude Code lists Remotrol's tools: its settings file names the script (user or project scope). */
 function registered(): boolean {
+  // Debug runs only: REMOTE_FAKE_CLAUDE=1 shows Claude Code as set up, for store and site pictures.
+  if (!app.isPackaged && process.env.REMOTE_FAKE_CLAUDE === "1") return true;
   try {
     return readFileSync(join(homedir(), ".claude.json"), "utf8").includes("remote-mcp.mjs");
   } catch {
