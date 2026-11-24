@@ -36,7 +36,7 @@
 brew install --cask runners-im/tap/remote
 ```
 
-또는 [Releases](https://github.com/RUNNERS-IM/remotrol/releases/latest) 에서 `remote-macos-arm64.dmg`(Apple silicon) · `remote-macos-x64.dmg`(Intel) 를 받습니다.
+또는 [Releases](https://github.com/RUNNERS-IM/remotrol/releases/latest) 에서 `remotrol-macos-arm64.dmg`(Apple silicon) · `remotrol-macos-x64.dmg`(Intel) 를 받습니다.
 
 Remotrol 은 macOS 권한 두 개를 묻습니다. 다른 컴퓨터가 이 화면을 보려면 **화면 기록**, 클릭 · 입력하려면 **손쉬운 사용**이 필요합니다. **다른 컴퓨터에 이 화면 보이기**를 끄면 둘 다 한 번에 막힙니다.
 

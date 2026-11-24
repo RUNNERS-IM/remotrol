@@ -36,7 +36,7 @@ Computers signed in to the same RUNNERS account find each other; there is no net
 brew install --cask runners-im/tap/remote
 ```
 
-Or download the latest `remote-macos-arm64.dmg` (Apple silicon) or `remote-macos-x64.dmg` (Intel) from [Releases](https://github.com/RUNNERS-IM/remotrol/releases/latest).
+Or download the latest `remotrol-macos-arm64.dmg` (Apple silicon) or `remotrol-macos-x64.dmg` (Intel) from [Releases](https://github.com/RUNNERS-IM/remotrol/releases/latest).
 
 Remotrol asks for two macOS permissions: **Screen Recording**, so other computers can see this one, and **Accessibility**, so they can click and type on it. **Let Other Computers See This** turns both off at once.
 
