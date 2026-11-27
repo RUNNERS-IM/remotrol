@@ -2,7 +2,7 @@
 // viewed), a panel under it listing the other computers, the Remote window that shows every office computer and one
 // computer's screens with clicks and typing, and Settings for everything about this Mac.
 import * as Sentry from "@sentry/electron/main";
-import { app, BrowserWindow, clipboard, ipcMain, Menu, nativeTheme, screen, shell, type Tray } from "electron";
+import { app, BrowserWindow, clipboard, ipcMain, Menu, nativeTheme, screen, session, shell, type Tray } from "electron";
 import { writeFileSync } from "node:fs";
 import { hostname, uptime, userInfo } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -416,6 +416,10 @@ function debugHooks(): void {
 function start(): void {
   // Why: Remote lives in the tray only, so it should not take a Dock slot on macOS.
   app.dock?.hide();
+  // Why: no Remotrol window needs the location, and Electron allows every page request by default (user, 2026-11-27:
+  // remove permissions that are not needed). Media stays allowed: the screen is sent through getUserMedia.
+  session.defaultSession.setPermissionRequestHandler((_contents, permission, done) => done(permission !== "geolocation"));
+  session.defaultSession.setPermissionCheckHandler((_contents, permission) => permission !== "geolocation");
   registerIpc();
   login.applyDefault();
   keepAlive.start();

@@ -93,6 +93,9 @@ module.exports = {
   appImage: { artifactName: `remotrol-${tag}-linux-x86_64.AppImage` },
   deb: { artifactName: `remotrol-${tag}-linux-amd64.deb` },
   rpm: { artifactName: `remotrol-${tag}-linux-x86_64.rpm` },
+  // Why: Electron's own Info.plist asks for the camera, microphone, Bluetooth and audio capture, none of which
+  // Remotrol uses; only Screen Recording (and Accessibility, which needs no text) stays (user, 2026-11-27).
+  afterPack: "./scripts/drop-usage-texts.cjs",
   // Read by electron-updater inside the app (app-update.yml). CI uploads the files itself (--publish never).
   publish: { provider: "github", owner: "RUNNERS-IM", repo: "remotrol" },
 };
